@@ -10,7 +10,7 @@ path = './'  # Relative path to your CSV file
 os.chdir(path)
 
 # Load the CSV file (make sure the file is in the same directory as this script)
-stemmen_ams = pd.read_csv('2021_stemmen_Amsterdam.csv')
+stemmen_ams = pd.read_csv('2021 stemmen Amsterdam.csv')
 
 # Clean the data by dropping rows with all NaN values and resetting the index
 stemmen_cleaned = stemmen_ams.dropna(how='all').reset_index(drop=True)
