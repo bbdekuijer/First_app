@@ -1,26 +1,28 @@
-# Check je huidige working directory
 import os
+import pandas as pd
+import streamlit as st
+
+# Check current working directory
 print(os.getcwd())
 
-# Pas je working directory aan indien gewenst
-path = 'C:\\Users\\bbdek\\Downloads' # zet hier wat voor jou goed is
+# Set working directory (change to a relative path if needed)
+path = './'  # Relative path to your CSV file
 os.chdir(path)
 
-stemmen_ams= pd.read_csv('2021 stemmen Amsterdam.csv')
+# Load the CSV file (make sure the file is in the same directory as this script)
+stemmen_ams = pd.read_csv('2021_stemmen_Amsterdam.csv')
 
+# Clean the data by dropping rows with all NaN values and resetting the index
 stemmen_cleaned = stemmen_ams.dropna(how='all').reset_index(drop=True)
 
 # Rename the first valid row as the header and drop the previous header rows
 stemmen_cleaned.columns = stemmen_cleaned.iloc[1]
 stemmen_cleaned = stemmen_cleaned.drop([0, 1]).reset_index(drop=True)
 
-# Website
-import streamlit as st
+# Streamlit app: Creating columns
+col1, col2 = st.columns([3, 1])  # col1 is wider, col2 is smaller (for the legend)
 
-# Maak kolommen aan
-col1, col2 = st.columns([3, 1])  # col1 is breder, col2 is smaller (voor legenda)
-
-# In col2 (rechter kolom) plaatsen we de legenda
+# In col2 (right column), we place the legend
 with col2:
     st.subheader('Legenda')
     st.write("""
@@ -29,13 +31,14 @@ with col2:
     - **Checkbox:** Vink deze aan om extra informatie te tonen.
     """)
 
-# In col1 (linker kolom) plaatsen we de interactieve widgets
+# In col1 (left column), we place the interactive widgets
 with col1:
     # Dropdown menu
-    opties = ["amsterdam", "centrum", "oost", "zuid", "west", "noord",  "nieuw_west", "zuidoost" ]
+    opties = ["amsterdam", "centrum", "oost", "zuid", "west", "noord", "nieuw_west", "zuidoost"]
     geselecteerde_optie = st.selectbox('Kies een regio:', opties)
     st.write(f"Geselecteerde regio: {geselecteerde_optie}")
-  # Navigatie logica gebaseerd op de geselecteerde regio
+
+    # Navigation logic based on the selected region
     if geselecteerde_optie == "amsterdam":
         st.subheader("Welkom in Amsterdam!")
         st.write("""
@@ -98,91 +101,32 @@ with col1:
         het winkelcentrum de Amsterdamse Poort, en diverse concertzalen zoals de Ziggo Dome en AFAS Live.
         """)
 
-
-
-# Vooraf voorbereide lijst met partijen en stemmen
+# Predefined list of parties and votes
 parties = [
-    'D66',  # 99649
-    'VVD',  # 55445
-    'GROENLINKS',  # 44907
-    'Partij van de Arbeid (P.v.d.A.)',  # 32783
-    'Partij voor de Dieren',  # 30880
-    'DENK',  # 29384
-    'Volt',  # 25988
-    'BIJ1',  # 25563
-    'PVV (Partij voor de Vrijheid)',  # 22180
-    'SP (Socialistische Partij)',  # 21478
-    'Forum voor Democratie',  # 11971
-    'CDA',  # 10815
-    'ChristenUnie',  # 6214
-    'JA21',  # 5282
-    'NIDA',  # 5053
-    '50PLUS',  # 2355
-    'JONG',  # 1278
-    'CODE ORANJE',  # 864
-    'Staatkundig Gereformeerde Partij (SGP)',  # 586
-    'Piratenpartij',  # 391
-    'Trots op Nederland (TROTS)',  # 384
-    'LP (Libertaire Partij)',  # 383
-    'Splinter',  # 343
-    'JEZUS LEEFT',  # 301
-    'NLBeter',  # 297
-    'BBB',  # 276
-    'OPRECHT',  # 247
-    'U-Buntu Connected Front',  # 221
-    'Partij voor de Republiek',  # 151
-    'De Groenen',  # 151
-    'Partij van de Eenheid',  # 144
-    'Lijst Henk Krol',  # 106
-    'Vrij en Sociaal Nederland'  # 89
+    'D66', 'VVD', 'GROENLINKS', 'Partij van de Arbeid (P.v.d.A.)', 'Partij voor de Dieren',
+    'DENK', 'Volt', 'BIJ1', 'PVV (Partij voor de Vrijheid)', 'SP (Socialistische Partij)',
+    'Forum voor Democratie', 'CDA', 'ChristenUnie', 'JA21', 'NIDA', '50PLUS', 'JONG',
+    'CODE ORANJE', 'Staatkundig Gereformeerde Partij (SGP)', 'Piratenpartij', 
+    'Trots op Nederland (TROTS)', 'LP (Libertaire Partij)', 'Splinter', 'JEZUS LEEFT', 
+    'NLBeter', 'BBB', 'OPRECHT', 'U-Buntu Connected Front', 'Partij voor de Republiek', 
+    'De Groenen', 'Partij van de Eenheid', 'Lijst Henk Krol', 'Vrij en Sociaal Nederland'
 ]
 
 votes = [
-    99649,  # D66
-    55445,  # VVD
-    44907,  # GROENLINKS
-    32783,  # Partij van de Arbeid (P.v.d.A.)
-    30880,  # Partij voor de Dieren
-    29384,  # DENK
-    25988,  # Volt
-    25563,  # BIJ1
-    22180,  # PVV (Partij voor de Vrijheid)
-    21478,  # SP (Socialistische Partij)
-    11971,  # Forum voor Democratie
-    10815,  # CDA
-    6214,   # ChristenUnie
-    5282,   # JA21
-    5053,   # NIDA
-    2355,   # 50PLUS
-    1278,   # JONG
-    864,    # CODE ORANJE
-    586,    # Staatkundig Gereformeerde Partij (SGP)
-    391,    # Piratenpartij
-    384,    # Trots op Nederland (TROTS)
-    383,    # LP (Libertaire Partij)
-    343,    # Splinter
-    301,    # JEZUS LEEFT
-    297,    # NLBeter
-    276,    # BBB
-    247,    # OPRECHT
-    221,    # U-Buntu Connected Front
-    151,    # Partij voor de Republiek
-    151,    # De Groenen
-    144,    # Partij van de Eenheid
-    106,    # Lijst Henk Krol
-    89      # Vrij en Sociaal Nederland
+    99649, 55445, 44907, 32783, 30880, 29384, 25988, 25563, 22180, 21478, 11971, 
+    10815, 6214, 5282, 5053, 2355, 1278, 864, 586, 391, 384, 383, 343, 301, 297, 
+    276, 247, 221, 151, 151, 144, 106, 89
 ]
 
-# DataFrame maken
+# Create DataFrame for parties and votes
 parties_df = pd.DataFrame({'Party': parties, 'Votes': votes})
 
-# Slider om het aantal partijen te selecteren
+# Slider to select the number of parties
 num_parties = st.slider('Selecteer het aantal partijen om mee te rekenen:', min_value=1, max_value=len(parties), value=10)
 
-# Sorteren op stemmen en top partijen tonen op basis van de selectie
+# Sort by votes and display top parties based on the selection
 top_parties = parties_df.sort_values(by='Votes', ascending=False).head(num_parties)
 
-# Resultaten tonen
+# Display results
 st.write(f"De top {num_parties} partijen op basis van stemmen zijn:")
 st.write(top_parties)
-
