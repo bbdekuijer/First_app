@@ -8,6 +8,13 @@ os.chdir(path)
 
 stemmen_ams= pd.read_csv('2021 stemmen Amsterdam.csv')
 
+stemmen_cleaned = stemmen_ams.dropna(how='all').reset_index(drop=True)
+
+# Rename the first valid row as the header and drop the previous header rows
+stemmen_cleaned.columns = stemmen_cleaned.iloc[1]
+stemmen_cleaned = stemmen_cleaned.drop([0, 1]).reset_index(drop=True)
+
+# Website
 import streamlit as st
 
 # Maak kolommen aan
