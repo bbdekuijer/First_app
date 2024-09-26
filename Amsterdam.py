@@ -10,22 +10,21 @@ st.title("Verkiezingsuitslagen 2021 Amsterdam")
 # Beschrijving
 st.write("""
 Deze kaart toont de verdeling van stemmen op de vijf grootste politieke partijen per stadsdeel in Amsterdam.
-De kleur van elk stadsdeel is gebaseerd op de grootste partij in dat stadsdeel.
 """)
 
-# Data voor het aantal stemmen per partij in elk stadsdeel
+# Data voor het aantal stemmen per partij in elk stadsdeel (zonder tekst tussen haakjes)
 stadsdeel_data = pd.DataFrame({
     'Stadsdeel': ['Centrum', 'West', 'Zuid', 'Zuidoost', 'Oost', 'Noord', 'Nieuw-West'],
     'VVD': [6925, 7054, 19318, 3347, 7315, 4576, 6910],
     'D66': [15804, 17686, 26210, 4297, 18430, 7465, 9757],
-    'PVV': [1789, 2232, 5667, 1866, 2128, 4492, 4006],
+    'PVV': [1789, 2232, 5667, 1866, 2128, 4492, 4006],  # Alleen PVV, geen extra tekst
     'CDA': [1144, 1128, 4112, 732, 1243, 1028, 1428],
-    'SP': [2481, 2876, 5387, 2226, 2897, 2725, 2886],
-    'Total Votes': [56596, 67786, 106662, 33351, 70863, 45085, 60317]
+    'SP': [2481, 2876, 5387, 2226, 2897, 2725, 2886],  # Alleen SP, geen extra tekst
+    'Total Votes': [56596, 67786, 106662, 33351, 70863, 45085, 60317]  # Totaal aantal stemmen per stadsdeel
 })
 
 # Bereken de percentages per partij
-for partij in ['VVD', 'D66', 'PVV', 'CDA', 'SP']:
+for partij in ['VVD', 'D66', 'PVV', 'CDA', 'SP']:  # Kolommen zonder extra tekst
     stadsdeel_data[partij + ' %'] = (stadsdeel_data[partij] / stadsdeel_data['Total Votes']) * 100
 
 # Coördinaten van de stadsdelen (centroiden)
@@ -39,45 +38,20 @@ stadsdeel_coords = {
     'Nieuw-West': [52.3600, 4.8103]
 }
 
-# Functie om de grootste partij per stadsdeel te bepalen
-def get_largest_party(row):
-    partijen = ['VVD', 'D66', 'PVV', 'CDA', 'SP']
-    return max(partijen, key=lambda partij: row[partij])
-
-# Voeg een kolom toe met de grootste partij per stadsdeel
-stadsdeel_data['Grootste Partij'] = stadsdeel_data.apply(get_largest_party, axis=1)
-
-# Kleurenschema voor de grootste partijen
-party_colors = {
-    'VVD': '#1f77b4',
-    'D66': '#2ca02c',
-    'PVV': '#ff7f0e',
-    'CDA': '#d62728',
-    'SP': '#9467bd'
-}
-
-# Download de GeoJSON met stadsdeelgrenzen van Amsterdam
+# Download de GeoJSON met stadsdeel grenzen
 geojson_url = 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=INDELING_STADSDEEL&THEMA=gebiedsindeling'
 response = requests.get(geojson_url)
 geojson_data = response.json()
 
-# Maak de folium kaart
+# Initialise de folium kaart gecentreerd op Amsterdam
 amsterdam_map = folium.Map(location=[52.3676, 4.9041], zoom_start=11)
 
-# Voeg de GeoJSON laag toe en kleur per grootste partij
-folium.GeoJson(
-    geojson_data,
-    name="Stadsdelen",
-    style_function=lambda feature: {
-        'fillColor': party_colors[stadsdeel_data[stadsdeel_data['Stadsdeel'] == feature['properties']['Stadsdeel']]['Grootste Partij'].values[0]],
-        'color': 'black',
-        'weight': 1,
-        'fillOpacity': 0.7
-    }
-).add_to(amsterdam_map)
+# Voeg de GeoJSON laag toe met stadsdelen
+folium.GeoJson(geojson_data, name="Stadsdelen").add_to(amsterdam_map)
 
-# Voeg markers en pop-ups toe met de percentages per partij per stadsdeel
+# Voeg markers en pop-ups toe met de top 5 partijen per stadsdeel (in percentages)
 for index, row in stadsdeel_data.iterrows():
+    # Pop-up tekst met grotere lettergrootte en bold stijl (zonder haakjes)
     popup_text = f"""
     <div style="font-size: 14pt;">
     <b>{row['Stadsdeel']}</b><br>
@@ -88,32 +62,18 @@ for index, row in stadsdeel_data.iterrows():
     SP: {row['SP %']:.2f}%<br>
     </div>
     """
+
+# Verkrijg de coördinaten voor het huidige stadsdeel
+    coords = stadsdeel_coords.get(row['Stadsdeel'], [52.3676, 4.9041])  # Standaard coördinaten indien niet gevonden
     
-    coords = stadsdeel_coords.get(row['Stadsdeel'], [52.3676, 4.9041])  # Fallback indien niet gevonden
-    
+    # Voeg een marker toe met de grotere pop-up
     folium.Marker(
         location=coords,
         popup=folium.Popup(popup_text, max_width=300)  # Vergroot de breedte van de pop-up
     ).add_to(amsterdam_map)
 
-# Voeg een legenda toe voor de grootste partijen
-legend_html = '''
- <div style="position: fixed; 
-     bottom: 50px; left: 50px; width: 200px; height: 150px; 
-     background-color: white; border:2px solid grey; z-index:9999; font-size:14px;">
- <h4 style="margin-left: 10px;">Grootste Partij per Stadsdeel</h4>
- <i style="background: #1f77b4"></i> VVD<br>
- <i style="background: #2ca02c"></i> D66<br>
- <i style="background: #ff7f0e"></i> PVV<br>
- <i style="background: #d62728"></i> CDA<br>
- <i style="background: #9467bd"></i> SP<br>
- </div>
- '''
-amsterdam_map.get_root().html.add_child(folium.Element(legend_html))
-
 # Toon de kaart in Streamlit
 st_folium(amsterdam_map, width=725)
-
 
 import os
 import pandas as pd
