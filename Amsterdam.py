@@ -242,6 +242,12 @@ groepering['percentage_gestemd'] = (groepering['aangetroffen stembiljetten'] / g
 stadsdelen = groepering.index
 percentages = groepering['percentage_gestemd']
 
+# Voeg een titel toe aan de Streamlit-app
+st.title("Stempercentage per Stadsdeel in Amsterdam (2021)")
+
+# Beschrijvende tekst
+st.write("Deze grafiek toont het percentage van gestemde mensen per stadsdeel in Amsterdam tijdens de Tweede Kamerverkiezingen van 2021. Optioneel kun je de nationale opkomstlijn weergeven door de checkbox hieronder aan te vinken.")
+
 # Checkbox voor het tonen van de nationale opkomstlijn
 toon_nationale_opkomst = st.checkbox('Toon nationale opkomstlijn')
 
