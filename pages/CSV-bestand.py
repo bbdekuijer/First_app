@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Laad de CSV-bestand
-csv_file = '2021 stemmen Amsterdam'  # Zorg ervoor dat dit bestand in dezelfde map staat
+csv_file = '2021 stemmen Amsterdam.csv'  # Zorg ervoor dat dit bestand in dezelfde map staat
 data = pd.read_csv(csv_file)
 
 # Hoofd Streamlit-app
@@ -25,6 +25,6 @@ csv = convert_df(data)
 st.download_button(
     label="Download CSV",
     data=csv,
-    file_name='stem_data.csv',
+    file_name='2021_stemmen_amsterdam.csv',
     mime='text/csv',
 )
