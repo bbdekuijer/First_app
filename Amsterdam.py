@@ -247,10 +247,6 @@ groepering = stemmen_cleaned.groupby('stadsdeel')[['opgeroepenen', 'aangetroffen
 # Bereken het percentage van gestemde mensen per stadsdeel
 groepering['percentage_gestemd'] = (groepering['aangetroffen stembiljetten'] / groepering['opgeroepenen']) * 100
 
-# Bekijk het resultaat
-st.write("Percentage Gestemd per Stadsdeel:")
-st.dataframe(groepering[['percentage_gestemd']])
-
 # Stel de stadsdeelnamen en het percentage gestemd in
 stadsdelen = groepering.index
 percentages = groepering['percentage_gestemd']
