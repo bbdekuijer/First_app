@@ -111,12 +111,12 @@ with col2:
 # In col1 (left column), we place the interactive widgets
 with col1:
     # Dropdown menu
-    opties = ["amsterdam", "centrum", "oost", "zuid", "west", "noord", "nieuw_west", "zuidoost"]
+    opties = ["Amsterdam", "Centrum", "Oost", "Zuid", "West", "Noord", "Nieuw_West", "Zuidoost"]
     geselecteerde_optie = st.selectbox('Kies een regio:', opties)
     st.write(f"Geselecteerde regio: {geselecteerde_optie}")
 
     # Navigation logic based on the selected region
-    if geselecteerde_optie == "amsterdam":
+    if geselecteerde_optie == "Amsterdam":
         st.subheader("Welkom in Amsterdam!")
         st.write("""
         Amsterdam is de hoofdstad van Nederland en bekend om zijn grachten, musea, 
@@ -124,7 +124,7 @@ with col1:
         elk hun eigen karakter hebben.
         """)
 
-    elif geselecteerde_optie == "centrum":
+    elif geselecteerde_optie == "Centrum":
         st.subheader("Welkom in het Centrum van Amsterdam!")
         st.write("""
         Het centrum van Amsterdam is het oudste en meest toeristische deel van de stad. 
@@ -132,7 +132,7 @@ with col1:
         de Dam en het Anne Frank Huis.
         """)
 
-    elif geselecteerde_optie == "oost":
+    elif geselecteerde_optie == "Oost":
         st.subheader("Welkom in Amsterdam Oost!")
         st.write("""
         Amsterdam Oost is een diverse wijk met zowel traditionele als moderne architectuur. 
@@ -140,7 +140,7 @@ with col1:
         van de Dappermarkt.
         """)
 
-    elif geselecteerde_optie == "zuid":
+    elif geselecteerde_optie == "Zuid":
         st.subheader("Welkom in Amsterdam Zuid!")
         st.write("""
         Amsterdam Zuid staat bekend om het Museumplein, waar je het Rijksmuseum, 
@@ -148,7 +148,7 @@ with col1:
         van de stad, met veel winkels en restaurants.
         """)
 
-    elif geselecteerde_optie == "west":
+    elif geselecteerde_optie == "West":
         st.subheader("Welkom in Amsterdam West!")
         st.write("""
         Amsterdam West is een diverse buurt met een mix van culturen. Het Westerpark 
@@ -156,14 +156,14 @@ with col1:
         en restaurants.
         """)
 
-    elif geselecteerde_optie == "noord":
+    elif geselecteerde_optie == "Noord":
         st.subheader("Welkom in Amsterdam Noord!")
         st.write("""
         Amsterdam Noord is een snelgroeiend deel van de stad. Vroeger een industriële zone, 
         maar tegenwoordig bekend om moderne wijken en culturele hotspots zoals de NDSM-werf.
         """)
 
-    elif geselecteerde_optie == "nieuw_west":
+    elif geselecteerde_optie == "Nieuw_West":
         st.subheader("Welkom in Amsterdam Nieuw-West!")
         st.write("""
         Amsterdam Nieuw-West is een van de grootste stadsdelen van de stad. Het biedt veel 
@@ -171,7 +171,7 @@ with col1:
         favoriete recreatiegebieden.
         """)
 
-    elif geselecteerde_optie == "zuidoost":
+    elif geselecteerde_optie == "Zuidoost":
         st.subheader("Welkom in Amsterdam Zuidoost!")
         st.write("""
         Amsterdam Zuidoost is een multiculturele wijk en bekend vanwege de Johan Cruijff Arena, 
