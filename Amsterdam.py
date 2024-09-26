@@ -1,132 +1,100 @@
-import os
+import folium
 import pandas as pd
+import requests
+import matplotlib.pyplot as plt
+import seaborn as sns
+import base64
+from io import BytesIO
 import streamlit as st
+from streamlit_folium import st_folium
 
-# Check current working directory
-print(os.getcwd())
+# Streamlit app title
+st.title("Amsterdam Election Results by Stadsdeel")
 
-# Set working directory (change to a relative path if needed)
-path = './'  # Relative path to your CSV file
-os.chdir(path)
+# Data for total votes per party in each stadsdeel
+stadsdeel_data = pd.DataFrame({
+    'Stadsdeel': ['Centrum', 'West', 'Zuid', 'Zuidoost', 'Oost', 'Noord', 'Nieuw-West'],
+    'VVD': [6925, 7054, 19318, 3347, 7315, 4576, 6910],
+    'D66': [15804, 17686, 26210, 4297, 18430, 7465, 9757],
+    'PVV (Partij voor de Vrijheid)': [1789, 2232, 5667, 1866, 2128, 4492, 4006],
+    'CDA': [1144, 1128, 4112, 732, 1243, 1028, 1428],
+    'SP (Socialistische Partij)': [2481, 2876, 5387, 2226, 2897, 2725, 2886],
+    'Total Votes': [56596, 67786, 106662, 33351, 70863, 45085, 60317]  # Total votes per stadsdeel
+})
 
-# Load the CSV file (make sure the file is in the same directory as this script)
-stemmen_ams = pd.read_csv('2021 stemmen Amsterdam.csv')
+# Calculate percentages for each party
+partij_columns = ['VVD', 'D66', 'PVV (Partij voor de Vrijheid)', 'CDA', 'SP (Socialistische Partij)']
+for partij in partij_columns:
+    stadsdeel_data[partij + ' %'] = (stadsdeel_data[partij] / stadsdeel_data['Total Votes']) * 100
 
-# Clean the data by dropping rows with all NaN values and resetting the index
-stemmen_cleaned = stemmen_ams.dropna(how='all').reset_index(drop=True)
+# Stadsdeel centroid coordinates
+stadsdeel_coords = {
+    'Centrum': [52.3728, 4.8936],
+    'West': [52.3792, 4.8654],
+    'Zuid': [52.3383, 4.8720],
+    'Zuidoost': [52.3070, 4.9725],
+    'Oost': [52.3625, 4.9415],
+    'Noord': [52.4009, 4.9163],
+    'Nieuw-West': [52.3600, 4.8103]
+}
 
-# Rename the first valid row as the header and drop the previous header rows
-stemmen_cleaned.columns = stemmen_cleaned.iloc[1]
-stemmen_cleaned = stemmen_cleaned.drop([0, 1]).reset_index(drop=True)
+# Download the GeoJSON with stadsdeel boundaries
+geojson_url = 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=INDELING_STADSDEEL&THEMA=gebiedsindeling'
+response = requests.get(geojson_url)
+geojson_data = response.json()
 
-# Streamlit app: Creating columns
-col1, col2 = st.columns([3, 1])  # col1 is wider, col2 is smaller (for the legend)
+# Initialize the folium map centered on Amsterdam
+amsterdam_map = folium.Map(location=[52.3676, 4.9041], zoom_start=11)
 
-# In col2 (right column), we place the legend
-with col2:
-    st.subheader('Legenda')
-    st.write("""
-    - **Dropdown Menu:** kies een regio uit de lijst.
-    - **Slider:** Verschuif de slider om het aantal partijen te kiezen tussen 0 en 33.
-    - **Checkbox:** Vink deze aan om extra informatie te tonen.
-    """)
+# Add the GeoJSON layer with the stadsdelen boundaries
+folium.GeoJson(geojson_data, name="Stadsdelen").add_to(amsterdam_map)
 
-# In col1 (left column), we place the interactive widgets
-with col1:
-    # Dropdown menu
-    opties = ["amsterdam", "centrum", "oost", "zuid", "west", "noord", "nieuw_west", "zuidoost"]
-    geselecteerde_optie = st.selectbox('Kies een regio:', opties)
-    st.write(f"Geselecteerde regio: {geselecteerde_optie}")
+# Function to create pie charts and encode them as base64 using seaborn colors
+def create_pie_chart(row):
+    # Data for the pie chart
+    labels = ['VVD', 'D66', 'PVV (Partij voor de Vrijheid)', 'CDA', 'SP (Socialistische Partij)']
+    sizes = [row[partij + ' %'] for partij in labels]
+    
+    # Use seaborn color palette for better visuals
+    colors = sns.color_palette("pastel")[0:5]
+    
+    # Create the pie chart
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    
+    # Save the pie chart as a PNG in memory
+    img = BytesIO()
+    plt.savefig(img, format='png', bbox_inches='tight')
+    plt.close(fig)
+    img.seek(0)
+    
+    # Encode the image in base64
+    img_base64 = base64.b64encode(img.read()).decode('utf-8')
+    return img_base64
 
-    # Navigation logic based on the selected region
-    if geselecteerde_optie == "amsterdam":
-        st.subheader("Welkom in Amsterdam!")
-        st.write("""
-        Amsterdam is de hoofdstad van Nederland en bekend om zijn grachten, musea, 
-        en rijke geschiedenis. Het is een diverse stad met verschillende wijken die
-        elk hun eigen karakter hebben.
-        """)
+# Add markers and pop-ups with pie charts
+for index, row in stadsdeel_data.iterrows():
+    # Create the pie chart
+    pie_chart_img = create_pie_chart(row)
+    
+    # HTML for the pop-up with the pie chart image
+    html = f"""
+    <b>{row['Stadsdeel']}</b><br>
+    <img src="data:image/png;base64,{pie_chart_img}" style="width:200px;height:200px;">
+    """
+    
+    iframe = folium.IFrame(html, width=220, height=220)
+    popup = folium.Popup(iframe, max_width=250)
+    
+    # Get the coordinates for the current stadsdeel
+    coords = stadsdeel_coords.get(row['Stadsdeel'], [52.3676, 4.9041])  # Fallback to default if not found
+    
+    # Add marker with the pie chart
+    folium.Marker(
+        location=coords,
+        popup=popup
+    ).add_to(amsterdam_map)
 
-    elif geselecteerde_optie == "centrum":
-        st.subheader("Welkom in het Centrum van Amsterdam!")
-        st.write("""
-        Het centrum van Amsterdam is het oudste en meest toeristische deel van de stad. 
-        Het is bekend om de prachtige grachten, historische gebouwen, het Koninklijk Paleis,
-        de Dam en het Anne Frank Huis.
-        """)
-
-    elif geselecteerde_optie == "oost":
-        st.subheader("Welkom in Amsterdam Oost!")
-        st.write("""
-        Amsterdam Oost is een diverse wijk met zowel traditionele als moderne architectuur. 
-        Het Oosterpark en Artis zijn bekende trekpleisters, evenals de culturele smeltkroes 
-        van de Dappermarkt.
-        """)
-
-    elif geselecteerde_optie == "zuid":
-        st.subheader("Welkom in Amsterdam Zuid!")
-        st.write("""
-        Amsterdam Zuid staat bekend om het Museumplein, waar je het Rijksmuseum, 
-        Van Gogh Museum en het Stedelijk Museum kunt vinden. Het is een van de luxere wijken 
-        van de stad, met veel winkels en restaurants.
-        """)
-
-    elif geselecteerde_optie == "west":
-        st.subheader("Welkom in Amsterdam West!")
-        st.write("""
-        Amsterdam West is een diverse buurt met een mix van culturen. Het Westerpark 
-        is een populaire ontmoetingsplek, en de wijk staat bekend om zijn gezellige markten 
-        en restaurants.
-        """)
-
-    elif geselecteerde_optie == "noord":
-        st.subheader("Welkom in Amsterdam Noord!")
-        st.write("""
-        Amsterdam Noord is een snelgroeiend deel van de stad. Vroeger een industriële zone, 
-        maar tegenwoordig bekend om moderne wijken en culturele hotspots zoals de NDSM-werf.
-        """)
-
-    elif geselecteerde_optie == "nieuw_west":
-        st.subheader("Welkom in Amsterdam Nieuw-West!")
-        st.write("""
-        Amsterdam Nieuw-West is een van de grootste stadsdelen van de stad. Het biedt veel 
-        ruimte en groen, en er zijn veel nieuwbouwwoningen. Het Sloterpark en Sloterplas zijn 
-        favoriete recreatiegebieden.
-        """)
-
-    elif geselecteerde_optie == "zuidoost":
-        st.subheader("Welkom in Amsterdam Zuidoost!")
-        st.write("""
-        Amsterdam Zuidoost is een multiculturele wijk en bekend vanwege de Johan Cruijff Arena, 
-        het winkelcentrum de Amsterdamse Poort, en diverse concertzalen zoals de Ziggo Dome en AFAS Live.
-        """)
-
-# Predefined list of parties and votes
-parties = [
-    'D66', 'VVD', 'GROENLINKS', 'Partij van de Arbeid (P.v.d.A.)', 'Partij voor de Dieren',
-    'DENK', 'Volt', 'BIJ1', 'PVV (Partij voor de Vrijheid)', 'SP (Socialistische Partij)',
-    'Forum voor Democratie', 'CDA', 'ChristenUnie', 'JA21', 'NIDA', '50PLUS', 'JONG',
-    'CODE ORANJE', 'Staatkundig Gereformeerde Partij (SGP)', 'Piratenpartij', 
-    'Trots op Nederland (TROTS)', 'LP (Libertaire Partij)', 'Splinter', 'JEZUS LEEFT', 
-    'NLBeter', 'BBB', 'OPRECHT', 'U-Buntu Connected Front', 'Partij voor de Republiek', 
-    'De Groenen', 'Partij van de Eenheid', 'Lijst Henk Krol', 'Vrij en Sociaal Nederland'
-]
-
-votes = [
-    99649, 55445, 44907, 32783, 30880, 29384, 25988, 25563, 22180, 21478, 11971, 
-    10815, 6214, 5282, 5053, 2355, 1278, 864, 586, 391, 384, 383, 343, 301, 297, 
-    276, 247, 221, 151, 151, 144, 106, 89
-]
-
-# Create DataFrame for parties and votes
-parties_df = pd.DataFrame({'Party': parties, 'Votes': votes})
-
-# Slider to select the number of parties
-num_parties = st.slider('Selecteer het aantal partijen om mee te rekenen:', min_value=1, max_value=len(parties), value=10)
-
-# Sort by votes and display top parties based on the selection
-top_parties = parties_df.sort_values(by='Votes', ascending=False).head(num_parties)
-
-# Display results
-st.write(f"De top {num_parties} partijen op basis van stemmen zijn:")
-st.write(top_parties)
+# Display the map using streamlit_folium
+st_folium(amsterdam_map, width=725)
