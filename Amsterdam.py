@@ -58,10 +58,10 @@ for index, row in stadsdeel_data.iterrows():
     # Verkrijg de coördinaten voor het huidige stadsdeel
     coords = stadsdeel_coords.get(row['Stadsdeel'], [52.3676, 4.9041])  # Standaard coördinaten indien niet gevonden
     
-    # Voeg een marker toe met de pop-up tekst
+    # Voeg een marker toe met de grotere pop-up
     folium.Marker(
         location=coords,
-        popup=popup_text
+        popup=folium.Popup(popup_text, max_width=300)  # Vergroot de breedte van de pop-up
     ).add_to(amsterdam_map)
 
 # Toon de kaart in Streamlit
