@@ -208,18 +208,12 @@ top_parties = parties_df.sort_values(by='Votes', ascending=False).head(num_parti
 st.write(f"De top {num_parties} partijen op basis van stemmen zijn:")
 st.write(top_parties)
 
-# Checkbox
-checkbox_waarde = st.checkbox('Aanvinken voor extra informatie')
-
-# Voorwaarde checken of de checkbox is aangevinkt
-if checkbox_waarde:
-    st.write("Je hebt de checkbox aangevinkt!")
-else:
-    st.write("Je hebt de checkbox niet aangevinkt.")
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+
+# Tekst
+st.write('Opkomst stemmen in Amsterdam per stadsdeel')
 
 # Laad het CSV-bestand
 stemmen_ams = pd.read_csv('2021 stemmen Amsterdam.csv')
