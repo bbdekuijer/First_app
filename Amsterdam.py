@@ -207,3 +207,12 @@ top_parties = parties_df.sort_values(by='Votes', ascending=False).head(num_parti
 # Display results
 st.write(f"De top {num_parties} partijen op basis van stemmen zijn:")
 st.write(top_parties)
+
+# Checkbox
+checkbox_waarde = st.checkbox('Aanvinken voor extra informatie')
+
+# Voorwaarde checken of de checkbox is aangevinkt
+if checkbox_waarde:
+    st.write("Je hebt de checkbox aangevinkt!")
+else:
+    st.write("Je hebt de checkbox niet aangevinkt.")
