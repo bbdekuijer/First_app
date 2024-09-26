@@ -20,11 +20,12 @@ stadsdeel_data = pd.DataFrame({
 # Partijen kolommen zonder tussen haakjes
 partij_columns = ['VVD', 'D66', 'PVV', 'CDA', 'SP', 'GroenLinks', 'PvdA']
 
-# Bereken percentages per partij
+# Bereken percentages per partij voor Centrum
+centrum_row = stadsdeel_data[stadsdeel_data['Stadsdeel'] == 'Centrum'].iloc[0]
 for partij in partij_columns:
-    stadsdeel_data[partij + ' %'] = (stadsdeel_data[partij] / stadsdeel_data['Total Votes']) * 100
+    stadsdeel_data.loc[stadsdeel_data['Stadsdeel'] == 'Centrum', partij + ' %'] = (centrum_row[partij] / centrum_row['Total Votes']) * 100
 
-# Functie om taartdiagrammen te maken voor alle partijen
+# Functie om taartdiagrammen te maken voor Centrum
 def create_pie_chart(row, stadsdeel):
     labels = partij_columns
     sizes = [row[partij] for partij in partij_columns]
@@ -49,8 +50,6 @@ def create_pie_chart(row, stadsdeel):
 # Hoofd Streamlit-app
 st.title("Stemverdeling per Stadsdeel in Amsterdam")
 
-# Genereer een taartdiagram voor elk stadsdeel en toon het
-for index, row in stadsdeel_data.iterrows():
-    img_bytes = create_pie_chart(row, row['Stadsdeel'])
-    st.image(img_bytes, caption=f"Stemverdeling in {row['Stadsdeel']}", use_column_width=True)
-
+# Genereer een taartdiagram voor Centrum en toon het
+img_bytes = create_pie_chart(centrum_row, centrum_row['Stadsdeel'])
+st.image(img_bytes, caption=f"Stemverdeling in {centrum_row['Stadsdeel']}", use_column_width=True)
