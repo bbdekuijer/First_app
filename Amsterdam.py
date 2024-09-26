@@ -1,3 +1,9 @@
+import folium
+import pandas as pd
+import requests
+import streamlit as st  # Voor Streamlit functionaliteit
+from streamlit_folium import st_folium  # Voor het renderen van de folium kaart
+
 # Titel van de applicatie
 st.title("Stemmen in Amsterdam per Stadsdeel")
 
