@@ -274,7 +274,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Laad het CSV-bestand
-stemmen_ams = pd.read_csv('tweede_kamer_stemmen_amsterdam.csv')
+stemmen_ams = pd.read_csv('2021 stemmen Amsterdam.csv')
 
 # Verwijder rijen met alleen NaN-waarden en reset de index
 stemmen_cleaned = stemmen_ams.dropna(how='all').reset_index(drop=True)
