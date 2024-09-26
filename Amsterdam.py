@@ -198,6 +198,9 @@ votes = [
 # Create DataFrame for parties and votes
 parties_df = pd.DataFrame({'Party': parties, 'Votes': votes})
 
+# Voeg een titel toe
+st.title("Top Partijen op Basis van Stemmen in Amsterdam (2021)")
+
 # Slider to select the number of parties
 num_parties = st.slider('Selecteer het aantal partijen om mee te rekenen:', min_value=1, max_value=len(parties), value=10)
 
