@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Laad de CSV-bestand
-csv_file = 'stem_data.csv'  # Zorg ervoor dat dit bestand in dezelfde map staat
+csv_file = '2021 stemmen Amsterdam'  # Zorg ervoor dat dit bestand in dezelfde map staat
 data = pd.read_csv(csv_file)
 
 # Hoofd Streamlit-app
