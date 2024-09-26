@@ -221,14 +221,17 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-stemmen_ams= pd.read_csv('2021 stemmen Amsterdam.csv')
+# Laad het CSV-bestand
+stemmen_ams = pd.read_csv('2021 stemmen Amsterdam.csv')
 
+# Verwijder rijen met alleen NaN-waarden en reset de index
 stemmen_cleaned = stemmen_ams.dropna(how='all').reset_index(drop=True)
 
-# Rename the first valid row as the header and drop the previous header rows
+# Hernoem de eerste geldige rij als header en verwijder de vorige header-rijen
 stemmen_cleaned.columns = stemmen_cleaned.iloc[1]
 stemmen_cleaned = stemmen_cleaned.drop([0, 1]).reset_index(drop=True)
 
+# Verwijder de eerste kolom (indien nodig)
 stemmen_cleaned = stemmen_cleaned.drop(stemmen_cleaned.columns[0], axis=1)
 
 # Eerst, groepeer per stadsdeel en bereken de som van 'opgeroepenen' en 'aangetroffen stembiljetten'
@@ -268,3 +271,4 @@ st.pyplot(plt)
 
 # Zorg ervoor dat je de figuur opnieuw instelt, zodat deze niet in de volgende weergave wordt hergebruikt
 plt.clf()
+
