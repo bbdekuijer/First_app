@@ -269,3 +269,66 @@ st.pyplot(plt)
 # Zorg ervoor dat je de figuur opnieuw instelt, zodat deze niet in de volgende weergave wordt hergebruikt
 plt.clf()
 
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Laad het CSV-bestand
+stemmen_ams = pd.read_csv('tweede_kamer_stemmen_amsterdam.csv')
+
+# Verwijder rijen met alleen NaN-waarden en reset de index
+stemmen_cleaned = stemmen_ams.dropna(how='all').reset_index(drop=True)
+
+# Hernoem de eerste geldige rij als header en verwijder de vorige header-rijen
+stemmen_cleaned.columns = stemmen_cleaned.iloc[1]
+stemmen_cleaned = stemmen_cleaned.drop([0, 1]).reset_index(drop=True)
+
+# Verwijder de eerste kolom (indien nodig)
+stemmen_cleaned = stemmen_cleaned.drop(stemmen_cleaned.columns[0], axis=1)
+
+# Zet de kolommen om naar numerieke waarden, forceer fouten naar NaN
+stemmen_cleaned['opgeroepenen'] = pd.to_numeric(stemmen_cleaned['opgeroepenen'], errors='coerce')
+stemmen_cleaned['geldige stembiljetten'] = pd.to_numeric(stemmen_cleaned['geldige stembiljetten'], errors='coerce')
+stemmen_cleaned['blanco stembiljetten'] = pd.to_numeric(stemmen_cleaned['blanco stembiljetten'], errors='coerce')
+stemmen_cleaned['ongeldige stembiljetten'] = pd.to_numeric(stemmen_cleaned['ongeldige stembiljetten'], errors='coerce')
+stemmen_cleaned['aangetroffen stembiljetten'] = pd.to_numeric(stemmen_cleaned['aangetroffen stembiljetten'], errors='coerce')
+
+# Eerst, groepeer per stadsdeel en bereken de som van 'opgeroepenen' en 'aangetroffen stembiljetten'
+groepering = stemmen_cleaned.groupby('stadsdeel')[['opgeroepenen', 'aangetroffen stembiljetten']].sum()
+
+# Bereken het percentage van gestemde mensen per stadsdeel
+groepering['percentage_gestemd'] = (groepering['aangetroffen stembiljetten'] / groepering['opgeroepenen']) * 100
+
+# Stel de stadsdeelnamen en het percentage gestemd in
+stadsdelen = groepering.index
+percentages = groepering['percentage_gestemd']
+
+# Checkbox voor het tonen van de nationale opkomstlijn
+toon_nationale_opkomst = st.checkbox('Toon nationale opkomstlijn')
+
+# Maak een figure en plot het histogram
+plt.figure(figsize=(10, 6))  # Zorg voor een grotere figuur om ruimte te maken voor de stadsdeelnamen
+plt.bar(stadsdelen, percentages)
+
+# Voeg de referentielijn toe voor de nationale opkomst als de checkbox is aangevinkt
+if toon_nationale_opkomst:
+    nationale_opkomst = 78.71
+    plt.axhline(y=nationale_opkomst, color='r', linestyle='--', label='Nationale Opkomst (78.71%)')
+
+# Labels en titel
+plt.xlabel('Stadsdeel', fontsize=12)
+plt.ylabel('Percentage Gestemd (%)', fontsize=12)
+plt.title('Percentage Gestemd per Stadsdeel', fontsize=14)
+
+# Draai de stadsdeelnamen verticaal zodat ze leesbaar zijn
+plt.xticks(rotation=90, fontsize=10)
+
+# Alleen een legenda tonen als de nationale opkomstlijn is ingeschakeld
+if toon_nationale_opkomst:
+    plt.legend()
+
+# Toon de grafiek in Streamlit
+st.pyplot(plt)
+
+# Zorg ervoor dat je de figuur opnieuw instelt, zodat deze niet in de volgende weergave wordt hergebruikt
+plt.clf()
