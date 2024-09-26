@@ -216,3 +216,45 @@ if checkbox_waarde:
     st.write("Je hebt de checkbox aangevinkt!")
 else:
     st.write("Je hebt de checkbox niet aangevinkt.")
+
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Eerst, groepeer per stadsdeel en bereken de som van 'opgeroepenen' en 'aangetroffen stembiljetten'
+groepering = stemmen_cleaned.groupby('stadsdeel')[['opgeroepenen', 'aangetroffen stembiljetten']].sum()
+
+# Bereken het percentage van gestemde mensen per stadsdeel
+groepering['percentage_gestemd'] = (groepering['aangetroffen stembiljetten'] / groepering['opgeroepenen']) * 100
+
+# Bekijk het resultaat
+st.write("Percentage Gestemd per Stadsdeel:")
+st.dataframe(groepering[['percentage_gestemd']])
+
+# Stel de stadsdeelnamen en het percentage gestemd in
+stadsdelen = groepering.index
+percentages = groepering['percentage_gestemd']
+
+# Maak een figure en plot het histogram
+plt.figure(figsize=(10, 6))  # Zorg voor een grotere figuur om ruimte te maken voor de stadsdeelnamen
+plt.bar(stadsdelen, percentages)
+
+# Voeg de referentielijn toe voor de nationale opkomst
+nationale_opkomst = 78.71
+plt.axhline(y=nationale_opkomst, color='r', linestyle='--', label='Nationale Opkomst (78.71%)')
+
+# Labels en titel
+plt.xlabel('Stadsdeel', fontsize=12)
+plt.ylabel('Percentage Gestemd (%)', fontsize=12)
+plt.title('Percentage Gestemd per Stadsdeel', fontsize=14)
+
+# Draai de stadsdeelnamen verticaal zodat ze leesbaar zijn
+plt.xticks(rotation=90, fontsize=10)
+
+plt.legend()
+
+# Toon de grafiek in Streamlit
+st.pyplot(plt)
+
+# Zorg ervoor dat je de figuur opnieuw instelt, zodat deze niet in de volgende weergave wordt hergebruikt
+plt.clf()
