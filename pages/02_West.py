@@ -49,7 +49,7 @@ def create_pie_chart(row, stadsdeel):
     return img_bytes
 
 # Hoofd Streamlit-app
-st.title("Stemverdeling per Stadsdeel in Amsterdam")
+st.title("Stemverdeling van de stemmen in stadsdeel Oost")
 
 # Genereer een taartdiagram voor West en toon het
 img_bytes = create_pie_chart(west_row, west_row['Stadsdeel'])
