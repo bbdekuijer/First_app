@@ -12,19 +12,19 @@ st.write("""
 Deze kaart toont de verdeling van stemmen op de vijf grootste politieke partijen per stadsdeel in Amsterdam.
 """)
 
-# Data voor het aantal stemmen per partij in elk stadsdeel
+# Data voor het aantal stemmen per partij in elk stadsdeel (zonder tekst tussen haakjes)
 stadsdeel_data = pd.DataFrame({
     'Stadsdeel': ['Centrum', 'West', 'Zuid', 'Zuidoost', 'Oost', 'Noord', 'Nieuw-West'],
     'VVD': [6925, 7054, 19318, 3347, 7315, 4576, 6910],
     'D66': [15804, 17686, 26210, 4297, 18430, 7465, 9757],
-    'PVV (Partij voor de Vrijheid)': [1789, 2232, 5667, 1866, 2128, 4492, 4006],
+    'PVV': [1789, 2232, 5667, 1866, 2128, 4492, 4006],  # Alleen PVV, geen extra tekst
     'CDA': [1144, 1128, 4112, 732, 1243, 1028, 1428],
-    'SP (Socialistische Partij)': [2481, 2876, 5387, 2226, 2897, 2725, 2886],
+    'SP': [2481, 2876, 5387, 2226, 2897, 2725, 2886],  # Alleen SP, geen extra tekst
     'Total Votes': [56596, 67786, 106662, 33351, 70863, 45085, 60317]  # Totaal aantal stemmen per stadsdeel
 })
 
 # Bereken de percentages per partij
-for partij in ['VVD', 'D66', 'PVV (Partij voor de Vrijheid)', 'CDA', 'SP (Socialistische Partij)']:
+for partij in ['VVD', 'D66', 'PVV', 'CDA', 'SP']:  # Kolommen zonder extra tekst
     stadsdeel_data[partij + ' %'] = (stadsdeel_data[partij] / stadsdeel_data['Total Votes']) * 100
 
 # Coördinaten van de stadsdelen (centroiden)
@@ -51,9 +51,17 @@ folium.GeoJson(geojson_data, name="Stadsdelen").add_to(amsterdam_map)
 
 # Voeg markers en pop-ups toe met de top 5 partijen per stadsdeel (in percentages)
 for index, row in stadsdeel_data.iterrows():
-    popup_text = f"<b>{row['Stadsdeel']}</b><br>"
-    for partij in ['VVD', 'D66', 'PVV', 'CDA', 'SP']:
-        popup_text += f"{partij}: {row[partij + ' %']:.2f}%<br>"
+    # Pop-up tekst met grotere lettergrootte en bold stijl (zonder haakjes)
+    popup_text = f"""
+    <div style="font-size: 14pt;">
+    <b>{row['Stadsdeel']}</b><br>
+    VVD: {row['VVD %']:.2f}%<br>
+    D66: {row['D66 %']:.2f}%<br>
+    PVV: {row['PVV %']:.2f}%<br>
+    CDA: {row['CDA %']:.2f}%<br>
+    SP: {row['SP %']:.2f}%<br>
+    </div>
+    """
     
     # Verkrijg de coördinaten voor het huidige stadsdeel
     coords = stadsdeel_coords.get(row['Stadsdeel'], [52.3676, 4.9041])  # Standaard coördinaten indien niet gevonden
@@ -66,3 +74,4 @@ for index, row in stadsdeel_data.iterrows():
 
 # Toon de kaart in Streamlit
 st_folium(amsterdam_map, width=725)
+
