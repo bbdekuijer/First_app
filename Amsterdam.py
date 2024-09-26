@@ -234,6 +234,13 @@ stemmen_cleaned = stemmen_cleaned.drop([0, 1]).reset_index(drop=True)
 # Verwijder de eerste kolom (indien nodig)
 stemmen_cleaned = stemmen_cleaned.drop(stemmen_cleaned.columns[0], axis=1)
 
+# Zet de kolommen om naar numerieke waarden, forceer fouten naar NaN
+stemmen_cleaned['opgeroepenen'] = pd.to_numeric(stemmen_cleaned['opgeroepenen'], errors='coerce')
+stemmen_cleaned['geldige stembiljetten'] = pd.to_numeric(stemmen_cleaned['geldige stembiljetten'], errors='coerce')
+stemmen_cleaned['blanco stembiljetten'] = pd.to_numeric(stemmen_cleaned['blanco stembiljetten'], errors='coerce')
+stemmen_cleaned['ongeldige stembiljetten'] = pd.to_numeric(stemmen_cleaned['ongeldige stembiljetten'], errors='coerce')
+stemmen_cleaned['aangetroffen stembiljetten'] = pd.to_numeric(stemmen_cleaned['aangetroffen stembiljetten'], errors='coerce')
+
 # Eerst, groepeer per stadsdeel en bereken de som van 'opgeroepenen' en 'aangetroffen stembiljetten'
 groepering = stemmen_cleaned.groupby('stadsdeel')[['opgeroepenen', 'aangetroffen stembiljetten']].sum()
 
