@@ -114,6 +114,7 @@ amsterdam_map.get_root().html.add_child(folium.Element(legend_html))
 # Toon de kaart in Streamlit
 st_folium(amsterdam_map, width=725)
 
+
 import os
 import pandas as pd
 import streamlit as st
