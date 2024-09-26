@@ -52,7 +52,7 @@ folium.GeoJson(geojson_data, name="Stadsdelen").add_to(amsterdam_map)
 # Voeg markers en pop-ups toe met de top 5 partijen per stadsdeel (in percentages)
 for index, row in stadsdeel_data.iterrows():
     popup_text = f"<b>{row['Stadsdeel']}</b><br>"
-    for partij in ['VVD', 'D66', 'PVV (Partij voor de Vrijheid)', 'CDA', 'SP (Socialistische Partij)']:
+    for partij in ['VVD', 'D66', 'PVV', 'CDA', 'SP']:
         popup_text += f"{partij}: {row[partij + ' %']:.2f}%<br>"
     
     # Verkrijg de coördinaten voor het huidige stadsdeel
