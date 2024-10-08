@@ -50,7 +50,7 @@ def add_categorical_legend(map_object, title, colors, labels):
     return map_object
 
 # Laad het JSON-bestand met stations (je moet het JSON-bestand in de juiste map plaatsen)
-with open('London stations.json', 'r') as f:
+with open('.devcontainer/London stations.json', 'r') as f:
     stations_data = json.load(f)
 
 # Neutrale basemap voor Londen
