@@ -1,7 +1,5 @@
 import folium
 import json
-import streamlit as st
-from streamlit_folium import folium_static
 
 # Functie om een layer aan te maken voor een specifieke zone
 def create_zone_layer(stations_data, zone, map_object, color):
@@ -32,7 +30,7 @@ def create_zone_layer(stations_data, zone, map_object, color):
     
     return map_object
 
-# Laad het JSON-bestand met stations (gebruik de juiste padlocatie voor jouw bestand)
+# Laad het JSON-bestand met stations
 with open('London stations.json', 'r') as f:
     stations_data = json.load(f)
 
@@ -78,10 +76,5 @@ m = add_categorical_legend(m, 'Station Types',
 # Voeg de laagbesturing (layer control) toe zodat de gebruiker lagen kan aan/uitzetten
 folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
 
-# Streamlit layout
-st.title('London Metro Stations Map')
-st.write('Gebruik de lagenbesturing om de stations per zone te bekijken.')
-
-# Gebruik folium_static om de kaart in Streamlit weer te geven
-folium_static(m)
-
+# Toon de kaart
+m
