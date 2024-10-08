@@ -1,7 +1,6 @@
-import streamlit as st
 import folium
 import json
-from streamlit_folium import st_folium
+import streamlit
 
 # Functie om een layer aan te maken voor een specifieke zone
 def create_zone_layer(stations_data, zone, map_object, color):
@@ -32,24 +31,7 @@ def create_zone_layer(stations_data, zone, map_object, color):
     
     return map_object
 
-# Functie om een categorische legenda aan de kaart toe te voegen
-def add_categorical_legend(map_object, title, colors, labels):
-    legend_html = f'''
-     <div style="position: fixed; 
-     top: 10px; right: 10px; width: 150px; height: 180px; 
-     background-color: white; z-index:9999; font-size:14px;
-     padding: 10px;
-     border: 2px solid grey;
-     ">
-     <h4>{title}</h4>
-     '''
-    for color, label in zip(colors, labels):
-        legend_html += f'<i style="background:{color};width:18px;height:18px;float:left;margin-right:10px;"></i> {label}<br>'
-    legend_html += '</div>'
-    map_object.get_root().html.add_child(folium.Element(legend_html))
-    return map_object
-
-# Laad het JSON-bestand met stations (je moet het JSON-bestand in de juiste map plaatsen)
+# Laad het JSON-bestand met stations
 with open('London stations.json', 'r') as f:
     stations_data = json.load(f)
 
@@ -70,6 +52,23 @@ zone_colors = {
 for zone, color in zone_colors.items():
     m = create_zone_layer(stations_data, zone, m, color)
 
+# Functie om een categorische legenda aan de kaart toe te voegen
+def add_categorical_legend(map_object, title, colors, labels):
+    legend_html = f'''
+     <div style="position: fixed; 
+     top: 10px; right: 10px; width: 150px; height: 180px; 
+     background-color: white; z-index:9999; font-size:14px;
+     padding: 10px;
+     border: 2px solid grey;
+     ">
+     <h4>{title}</h4>
+     '''
+    for color, label in zip(colors, labels):
+        legend_html += f'<i style="background:{color};width:18px;height:18px;float:left;margin-right:10px;"></i> {label}<br>'
+    legend_html += '</div>'
+    map_object.get_root().html.add_child(folium.Element(legend_html))
+    return map_object
+
 # Voeg de categorische legenda toe
 m = add_categorical_legend(m, 'Station Types', 
                            colors=['red', 'orange', 'yellow', 'yellowgreen', 'green', 'cyan'], 
@@ -78,8 +77,5 @@ m = add_categorical_legend(m, 'Station Types',
 # Voeg de laagbesturing (layer control) toe zodat de gebruiker lagen kan aan/uitzetten
 folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
 
-# Streamlit code
-st.title('London Underground Stations Map by Zone')
-
-# Toon de kaart in Streamlit
-st_data = st_folium(m, width=725, height=500)
+# Toon de kaart
+m
