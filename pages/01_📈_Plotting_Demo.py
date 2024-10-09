@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load your metro datasets for different years
-@st.cache
+@st.cache_data
 def load_data():
     data = {}
     data['2017'] = pd.read_csv('.devcontainer/2017_Entry_Exit.csv')
