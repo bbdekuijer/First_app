@@ -70,3 +70,27 @@ if metro_data_dict:
         st.error(f"Data for the year {selected_year} could not be loaded.")
 else:
     st.error("Failed to load metro data.")
+
+metro_data_dict = load_data()
+
+# Check if the data was loaded successfully
+if metro_data_dict:
+    st.write("Data successfully loaded for the following years:")
+    st.write(list(metro_data_dict.keys()))  # This will display the loaded years
+
+    # Create a slider in the sidebar for year selection
+    st.sidebar.title("Select Year")
+    selected_year = st.sidebar.slider('Year', min_value=2007, max_value=2017, step=1, value=2017)
+
+    # Load the data for the selected year
+    metro_data = metro_data_dict.get(str(selected_year))
+
+    if metro_data is not None:
+        st.write(f"Data loaded for year {selected_year}:")
+        st.write(metro_data.head())  # Display the first few rows of the data for that year
+
+        # The rest of your logic for data processing and plotting
+    else:
+        st.error(f"No data available for year {selected_year}.")
+else:
+    st.error("Failed to load metro data.")
