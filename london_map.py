@@ -3,7 +3,7 @@ import folium
 import json
 from streamlit_folium import st_folium
 
-st.cache_data
+
 # Functie om een layer aan te maken voor een specifieke zone
 def create_zone_layer(stations_data, zone, map_object, color):
     # Filter de stations voor de specifieke zone
