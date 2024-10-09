@@ -120,25 +120,8 @@ def create_zone_layer(stations_data, zone, map_object, color):
     
     return map_object
 
-# Functie om een categorische legenda aan de kaart toe te voegen
-def add_categorical_legend(map_object, title, colors, labels):
-    legend_html = f'''
-     <div style="position: fixed; 
-     top: 10px; right: 10px; width: 150px; height: auto; 
-     background-color: white; z-index:9999; font-size:14px;
-     padding: 10px;
-     border: 2px solid grey;
-     ">
-     <h4>{title}</h4>
-     '''
-    for color, label in zip(colors, labels):
-        legend_html += f'<i style="background:{color};width:18px;height:18px;float:left;margin-right:10px;"></i> {label}<br>'
-    legend_html += '</div>'
-    map_object.get_root().html.add_child(folium.Element(legend_html))
-    return map_object
-
 # Laad het JSON-bestand met stations (je moet het JSON-bestand in de juiste map plaatsen)
-with open('London stations.json', 'r') as f:
+with open('.devcontainer/London stations.json', 'r') as f:
     stations_data = json.load(f)
 
 # Neutrale basemap voor Londen
@@ -158,11 +141,6 @@ zone_colors = {
 for zone, color in zone_colors.items():
     m = create_zone_layer(stations_data, zone, m, color)
 
-# Voeg de categorische legenda toe
-m = add_categorical_legend(m, 'Station Types', 
-                           colors=['red', 'orange', 'yellow', 'yellowgreen', 'green', 'cyan'], 
-                           labels=['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6'])
-
 # Voeg de laagbesturing (layer control) toe zodat de gebruiker lagen kan aan/uitzetten
 folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
 
@@ -171,3 +149,15 @@ st.title('London Underground Stations Map by Zone')
 
 # Toon de kaart in Streamlit
 st_data = st_folium(m, width=725, height=500)
+
+# Voeg de categorische legenda toe als tekst onder de kaart
+st.markdown("""
+### Station Types
+- <span style="color:red">●</span> Zone 1
+- <span style="color:orange">●</span> Zone 2
+- <span style="color:yellow">●</span> Zone 3
+- <span style="color:yellowgreen">●</span> Zone 4
+- <span style="color:green">●</span> Zone 5
+- <span style="color:cyan">●</span> Zone 6
+""", unsafe_allow_html=True)
+
