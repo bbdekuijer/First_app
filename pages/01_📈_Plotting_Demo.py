@@ -2,21 +2,23 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load your metro datasets for different years
-@st.cache_data
+@st.cache_data 
 def load_data():
     data = {}
-    data['2017'] = pd.read_csv('.devcontainer/2017_Entry_Exit.csv')
-    data['2016'] = pd.read_csv('.devcontainer/2016_Entry_Exit.csv')
-    data['2015'] = pd.read_csv('.devcontainer/2015_Entry_Exit.csv')
-    data['2014'] = pd.read_csv('.devcontainer/2014_Entry_Exit.csv')
-    data['2013'] = pd.read_csv('.devcontainer/2013_Entry_Exit.csv')
-    data['2012'] = pd.read_csv('.devcontainer/2012_Entry_Exit.csv')
-    data['2011'] = pd.read_csv('.devcontainer/2011_Entry_Exit.csv')
-    data['2010'] = pd.read_csv('.devcontainer/2010_Entry_Exit.csv')
-    data['2009'] = pd.read_csv('.devcontainer/2009_Entry_Exit.csv')
-    data['2008'] = pd.read_csv('.devcontainer/2008_Entry_Exit.csv')
-    data['2007'] = pd.read_csv('.devcontainer/2007_Entry_Exit.csv')
+    try:
+        data['2017'] = pd.read_csv('../.devcontainer/2017_Entry_Exit.csv')
+        data['2016'] = pd.read_csv('../.devcontainer/2016_Entry_Exit.csv')
+        data['2015'] = pd.read_csv('../.devcontainer/2015_Entry_Exit.csv')
+        data['2014'] = pd.read_csv('../.devcontainer/2014_Entry_Exit.csv')
+        data['2013'] = pd.read_csv('../.devcontainer/2013_Entry_Exit.csv')
+        data['2012'] = pd.read_csv('../.devcontainer/2012_Entry_Exit.csv')
+        data['2011'] = pd.read_csv('../.devcontainer/2011_Entry_Exit.csv')
+        data['2010'] = pd.read_csv('../.devcontainer/2010_Entry_Exit.csv')
+        data['2009'] = pd.read_csv('../.devcontainer/2009_Entry_Exit.csv')
+        data['2008'] = pd.read_csv('../.devcontainer/2008_Entry_Exit.csv')
+        data['2007'] = pd.read_csv('../.devcontainer/2007_Entry_Exit.csv')
+    except FileNotFoundError as e:
+        st.error(f"Error loading data: {e}")
     return data
 
 metro_data_dict = load_data()
