@@ -1,3 +1,4 @@
+import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -11,14 +12,14 @@ metro_data['total_usage'] = metro_data['Entry_Week'] + metro_data['Entry_Saturda
 top_25_stations = metro_data[['Station', 'total_usage']].sort_values(by='total_usage', ascending=False).head(25)
 
 # Plot the top 25 busiest stations
-plt.figure(figsize=(12, 8))
-plt.barh(top_25_stations['Station'], top_25_stations['total_usage'], color='steelblue')
-plt.xlabel('Total Metro Usage')
-plt.ylabel('Stations')
-plt.title('Top 25 Busiest Stations in London')
-plt.gca().invert_yaxis()  # Invert the y-axis to display the busiest station on top
-plt.tight_layout()
-plt.show()
+st.title('Top 25 Busiest Stations in London')
+fig, ax = plt.subplots(figsize=(12, 8))
+ax.barh(top_25_stations['Station'], top_25_stations['total_usage'], color='steelblue')
+ax.set_xlabel('Total Metro Usage')
+ax.set_ylabel('Stations')
+ax.set_title('Top 25 Busiest Stations in London')
+ax.invert_yaxis()  # Invert the y-axis to display the busiest station on top
+st.pyplot(fig)
 
 # Find peak times for each station by comparing weekday vs. weekend
 metro_data['peak_time'] = metro_data[['Entry_Week', 'Entry_Saturday', 'Entry_Sunday']].idxmax(axis=1)
@@ -27,11 +28,13 @@ metro_data['peak_time'] = metro_data[['Entry_Week', 'Entry_Saturday', 'Entry_Sun
 top_25_stations_with_peak = metro_data[metro_data['Station'].isin(top_25_stations['Station'])][['Station', 'peak_time']]
 
 # Display the top 25 stations with peak times
-print(top_25_stations_with_peak)
+st.subheader('Top 25 Stations with Peak Times')
+st.write(top_25_stations_with_peak)
 
 
-
+# Load the weather dataset
 weather_data= pd.read_csv('/Users/casijnvantill/Downloads/weather_london.csv')
+
 # Rename the date column
 weather_data.rename(columns={'Unnamed: 0': 'date'}, inplace=True)
 
@@ -46,40 +49,33 @@ weather_data['year'] = weather_data['date'].dt.year
 monthly_precipitation = weather_data.groupby('month')['prcp'].sum()
 
 # Plot the histogram of monthly precipitation
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(10, 6))
-plt.bar(monthly_precipitation.index, monthly_precipitation.values)
-plt.title('Monthly Precipitation in London')
-plt.xlabel('Month')
-plt.ylabel('Total Precipitation (mm)')
-plt.xticks(ticks=range(1, 13), labels=[
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-])
-
-# Display the plot
-plt.show()
-
+st.title('Monthly Precipitation in London')
+fig2, ax2 = plt.subplots(figsize=(10, 6))
+ax2.bar(monthly_precipitation.index, monthly_precipitation.values)
+ax2.set_title('Monthly Precipitation in London')
+ax2.set_xlabel('Month')
+ax2.set_ylabel('Total Precipitation (mm)')
+ax2.set_xticks(range(1, 13))
+ax2.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+st.pyplot(fig2)
 
 # Grouping the data by month to get average temperatures (tavg, tmin, tmax) per month
 monthly_temperatures = weather_data.groupby('month')[['tavg', 'tmin', 'tmax']].mean()
 
 # Plotting the monthly average, minimum, and maximum temperatures
-plt.figure(figsize=(10, 6))
-plt.plot(monthly_temperatures.index, monthly_temperatures['tavg'], label='Avg Temp', marker='o')
-plt.plot(monthly_temperatures.index, monthly_temperatures['tmin'], label='Min Temp', marker='o')
-plt.plot(monthly_temperatures.index, monthly_temperatures['tmax'], label='Max Temp', marker='o')
+st.title('Monthly Temperatures in London')
+fig3, ax3 = plt.subplots(figsize=(10, 6))
+ax3.plot(monthly_temperatures.index, monthly_temperatures['tavg'], label='Avg Temp', marker='o')
+ax3.plot(monthly_temperatures.index, monthly_temperatures['tmin'], label='Min Temp', marker='o')
+ax3.plot(monthly_temperatures.index, monthly_temperatures['tmax'], label='Max Temp', marker='o')
+ax3.set_title('Monthly Temperatures in London')
+ax3.set_xlabel('Month')
+ax3.set_ylabel('Temperature (°C)')
+ax3.set_xticks(range(1, 13))
+ax3.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+ax3.legend()
+st.pyplot(fig3)
 
-plt.title('Monthly Temperatures in London')
-plt.xlabel('Month')
-plt.ylabel('Temperature (°C)')
-plt.xticks(ticks=range(1, 13), labels=[
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-])
-plt.legend()
-
-# Display the plot
-plt.show()
 
 
 
