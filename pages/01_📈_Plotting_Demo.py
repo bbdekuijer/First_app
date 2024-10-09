@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 @st.cache
 def load_data():
     data = {}
-    data['2017'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2017_Entry_Exit.csv')
-    data['2016'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2016_Entry_Exit.csv')
-    data['2015'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2015_Entry_Exit.csv')
-    data['2014'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2014_Entry_Exit.csv')
-    data['2013'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2013_Entry_Exit.csv')
-    data['2012'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2012_Entry_Exit.csv')
-    data['2011'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2011_Entry_Exit.csv')
-    data['2010'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2010_Entry_Exit.csv')
-    data['2009'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2009_Entry_Exit.csv')
-    data['2008'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2008_Entry_Exit.csv')
-    data['2007'] = pd.read_csv('/Users/casijnvantill/Desktop/Data Science/Cases/Week 6/2007_Entry_Exit.csv')
+    data['2017'] = pd.read_csv('2017_Entry_Exit.csv')
+    data['2016'] = pd.read_csv('2016_Entry_Exit.csv')
+    data['2015'] = pd.read_csv('2015_Entry_Exit.csv')
+    data['2014'] = pd.read_csv('2014_Entry_Exit.csv')
+    data['2013'] = pd.read_csv('2013_Entry_Exit.csv')
+    data['2012'] = pd.read_csv('2012_Entry_Exit.csv')
+    data['2011'] = pd.read_csv('2011_Entry_Exit.csv')
+    data['2010'] = pd.read_csv('2010_Entry_Exit.csv')
+    data['2009'] = pd.read_csv('2009_Entry_Exit.csv')
+    data['2008'] = pd.read_csv('2008_Entry_Exit.csv')
+    data['2007'] = pd.read_csv('2007_Entry_Exit.csv')
     return data
 
 metro_data_dict = load_data()
@@ -44,7 +44,6 @@ ax.set_title(f'Top 25 Busiest Stations in London - {selected_year}')
 ax.invert_yaxis()  # Invert the y-axis to display the busiest station on top
 st.pyplot(fig)
 
-# Find peak times for each station by comparing weekday vs. weekend
 # Find peak times for each station by comparing weekday vs. weekend
 metro_data['peak_time'] = metro_data[['Entry_Week', 'Entry_Saturday', 'Entry_Sunday']].idxmax(axis=1)
 
