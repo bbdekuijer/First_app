@@ -9,9 +9,7 @@ filepath_w = ".devcontainer/df_temp_updated.csv"
 # Laden van de Bikeshare data en weerdata
 bike_data = pd.read_csv(filepath_b)
 weather = pd.read_csv(filepath_w)
-weather = weather.rename(columns={'Unnamed: 0': 'date'})
-weather = weather[['date', 'tavg', 'prcp', 'snow']].copy()
-weather = weather.fillna(0)
+
 
 # Converteer de datums naar datetime-indeling
 bike_data['Start date'] = pd.to_datetime(bike_data['Start date'])
