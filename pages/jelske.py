@@ -63,9 +63,9 @@ fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['Total Rides
 
 # Conditie voor het weergeven van de temperatuur of regenval
 if yaxis_option == 'Gemiddelde Temperatuur':
-    fig.add_trace(go.Scatter(x=merged_data['Start date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
+    fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
 elif yaxis_option == 'Regenval':
-    fig.add_trace(go.Bar(x=merged_data['Start date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
+    fig.add_trace(go.Bar(x=merged_data['Start Date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
 
 # Update lay-out voor de plot
 fig.update_layout(
