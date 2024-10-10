@@ -1,29 +1,48 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import urllib.request
 
-# Volledig pad naar de CSV-bestanden
-filepath_b = ".devcontainer/334JourneyDataExtract07Sep2022-11Sep2022.csv"
-filepath_w = ".devcontainer/df_temp_updated.csv"
+# URL naar het CSV-bestand
+url = "https://cycling.data.tfl.gov.uk/usage-stats/338JourneyDataExtract03Oct2022-09Oct2022.csv"
 
-# Laden van de Bikeshare data en weerdata
-bike_data = pd.read_csv(filepath_b)
+# Functie om de data in te lezen
+@st.cache
+def load_data(url):
+    # Maak een request met een aangepaste user-agent
+    req = urllib.request.Request(
+        url, 
+        headers={'User-Agent': 'Mozilla/5.0'}
+    )
+    
+    # Open de URL en lees de data in
+    with urllib.request.urlopen(req) as response:
+        data = pd.read_csv(response)
+    
+    return data
+
+# Data laden
+bike_data = load_data(url)
+
+# Bestandslocatie voor weerdata
+filepath_w = "/Users/jelskedeboer/Library/CloudStorage/OneDrive-HvA/Minor Data Science/London Case/Minor Data Science - 1072024 - 227 PM/weather_london.csv"
 weather = pd.read_csv(filepath_w)
 
-# Converteer de datums naar datetime-indeling met foutafhandeling
-bike_data['Start Date'] = pd.to_datetime(bike_data['Start Date'], errors='coerce')
-bike_data['End Date'] = pd.to_datetime(bike_data['End Date'], errors='coerce')
-weather['Date'] = pd.to_datetime(weather['Date'], errors='coerce')
+# Weerdata voorbereiden
+weather = weather.rename(columns={'Unnamed: 0': 'date'})
+weather = weather[['date', 'tavg', 'prcp', 'snow']].copy()
+weather['date'] = pd.to_datetime(weather['date'])
+weather = weather.fillna(0)
 
-# Verwijder rijen met NaT waarden na conversie
-bike_data = bike_data.dropna(subset=['Start Date', 'End Date'])
-weather = weather.dropna(subset=['Date'])
+# Converteer de datums naar datetime-indeling
+bike_data['Start date'] = pd.to_datetime(bike_data['Start date'])
+bike_data['End date'] = pd.to_datetime(bike_data['End date'])
 
 # Titel van de Streamlit app
 st.title('Fiets weer of niet?')
 
 # Locatielijst opstellen
-locations = bike_data['StartStation Name'].unique().tolist()
+locations = bike_data['Start station'].unique().tolist()
 
 # Checkbox voor totaal
 show_total = st.sidebar.checkbox('Toon data voor alle locaties')
@@ -38,17 +57,21 @@ else:
 if selected_location == 'Totaal':
     filtered_bike_data = bike_data
 else:
-    filtered_bike_data = bike_data[bike_data['StartStation Name'] == selected_location]
+    filtered_bike_data = bike_data[bike_data['Start station'] == selected_location]
 
-# Filter de weerdata op basis van de geselecteerde datum
-filtered_weather = weather[weather['Date'].dt.date.isin(filtered_bike_data['Start Date'].dt.date)]
+# Vraag de gebruiker om een datumbereik te selecteren
+start_date, end_date = st.sidebar.date_input("Selecteer datumbereik:", [filtered_bike_data['Start date'].min(), filtered_bike_data['Start date'].max()])
+
+# Filter de fietsdata en weerdata op basis van de geselecteerde datums
+filtered_bike_data = filtered_bike_data[(filtered_bike_data['Start date'] >= pd.to_datetime(start_date)) & (filtered_bike_data['Start date'] <= pd.to_datetime(end_date))]
+filtered_weather = weather[(weather['date'] >= pd.to_datetime(start_date)) & (weather['date'] <= pd.to_datetime(end_date))]
 
 # Groepeer de gefilterde data per dag en tel het aantal ritten
-trips_per_day = filtered_bike_data.groupby(filtered_bike_data['Start Date'].dt.date).size().reset_index(name='Total Rides')
+trips_per_day = filtered_bike_data.groupby(filtered_bike_data['Start date'].dt.date).size().reset_index(name='Total Rides')
 
 # Voeg weerdata toe aan de fietsritten per dag
-trips_per_day['Start Date'] = pd.to_datetime(trips_per_day['Start Date'])
-merged_data = pd.merge(trips_per_day, filtered_weather, left_on='Start Date', right_on='Date', how='left')
+trips_per_day['Start date'] = pd.to_datetime(trips_per_day['Start date'])
+merged_data = pd.merge(trips_per_day, filtered_weather, left_on='Start date', right_on='date', how='left')
 
 # Voeg een keuzemenu toe om te selecteren welke y-as weergeven wordt
 yaxis_option = st.sidebar.selectbox(
@@ -60,13 +83,13 @@ yaxis_option = st.sidebar.selectbox(
 fig = go.Figure()
 
 # Voeg fietsritten toe
-fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['Total Rides'], mode='lines+markers', name='Fietsritten', line=dict(color='blue')))
+fig.add_trace(go.Scatter(x=merged_data['Start date'], y=merged_data['Total Rides'], mode='lines+markers', name='Fietsritten', line=dict(color='blue')))
 
 # Conditie voor het weergeven van de temperatuur of regenval
 if yaxis_option == 'Gemiddelde Temperatuur':
-    fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
+    fig.add_trace(go.Scatter(x=merged_data['Start date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
 elif yaxis_option == 'Regenval':
-    fig.add_trace(go.Bar(x=merged_data['Start Date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
+    fig.add_trace(go.Bar(x=merged_data['Start date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
 
 # Update lay-out voor de plot
 fig.update_layout(
@@ -89,6 +112,3 @@ fig.update_layout(
 # Toon de plot in Streamlit
 st.plotly_chart(fig)
 
-
-# Render de grafiek in Streamlit
-st.plotly_chart(fig)
