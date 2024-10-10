@@ -13,9 +13,6 @@ weather = weather.rename(columns={'Unnamed: 0': 'date'})
 weather = weather[['date', 'tavg', 'prcp', 'snow']].copy()
 weather = weather.fillna(0)
 
-# Pas de kolomnamen aan
-bike_data.columns = ["Number", "Start date", "Start station", "Start station", "End date", "End station number", "End station", "Bike number", "Bike model", "Total duration", "Total duration (ms)"]
-
 # Converteer de datums naar datetime-indeling
 bike_data['Start date'] = pd.to_datetime(bike_data['Start date'])
 bike_data['End date'] = pd.to_datetime(bike_data['End date'])
