@@ -1,15 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import scipy
 import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
-pip install scipy
-
-
-# Definieer het exponentiële groeimodel
-def exponential_growth(x, a, b):
-    return a * np.exp(b * x)
 
 # Laad de metro datasets voor de verschillende jaren
 data_files = {
@@ -41,19 +33,19 @@ usage_df = pd.DataFrame(list(yearly_usage.items()), columns=['Jaar', 'Totaal_Geb
 # Verklein het gebruik naar miljoenen
 usage_df['Totaal_Gebruik'] = usage_df['Totaal_Gebruik'] / 1e6
 
-# Definieer de jaren en het gebruik voor het passen van het model
-x_data = usage_df['Jaar'] - usage_df['Jaar'].min()  # Begin de jaren vanaf 0 voor betere fitting
-y_data = usage_df['Totaal_Gebruik']
+# Bereken de groeisnelheid
+# We nemen de logaritme van de totale waarden om een lineaire relatie te krijgen voor exponentiële groei
+log_usage = np.log(usage_df['Totaal_Gebruik'])
+years = usage_df['Jaar'] - usage_df['Jaar'].min()
 
-# Pas het exponentiële groeimodel toe op de data
-popt, pcov = curve_fit(exponential_growth, x_data, y_data)
+# Gebruik een lineaire benadering voor de groeisnelheid
+# Met np.polyfit passen we een rechte lijn aan de logaritmische waarden
+slope, intercept = np.polyfit(years, log_usage, 1)
 
-# Maak een array van jaren van 2007 tot 2023
-years = np.arange(2007, 2024)
-x_forecast = years - usage_df['Jaar'].min()  # Verschuif de voorspelde jaren
-
-# Voorspel het metrogebruik met behulp van het model
-predicted_usage = exponential_growth(x_forecast, *popt)
+# Bereken de voorspelde waarden voor de jaren tot 2023
+forecast_years = np.arange(2007, 2024) - 2007  # 2007 is ons startpunt
+predicted_log_usage = intercept + slope * forecast_years
+predicted_usage = np.exp(predicted_log_usage)  # Exponent van de voorspelde log-waarden om terug te gaan naar originele schaal
 
 # Maak een Streamlit-titel
 st.title('Metrogebruik van 2007 tot 2023 met Exponentiële Groei')
@@ -61,7 +53,7 @@ st.title('Metrogebruik van 2007 tot 2023 met Exponentiële Groei')
 # Plot de werkelijke data en de voorspelde data
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.scatter(usage_df['Jaar'], usage_df['Totaal_Gebruik'], label='Werkelijke Data', color='blue')
-ax.plot(years, predicted_usage, label='Exponentiële Groei (Voorspelling)', color='red', linestyle='--')
+ax.plot(np.arange(2007, 2024), predicted_usage, label='Exponentiële Groei (Voorspelling)', color='red', linestyle='--')
 ax.set_title('Metrogebruik van 2007 tot 2023 (in Miljoenen)', fontsize=16)
 ax.set_xlabel('Jaar', fontsize=12)
 ax.set_ylabel('Totaal Metrogebruik (Miljoenen)', fontsize=12)
