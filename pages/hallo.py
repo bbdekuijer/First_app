@@ -10,9 +10,18 @@ filepath_w = ".devcontainer/df_temp_updated.csv"
 bike_data = pd.read_csv(filepath_b)
 weather = pd.read_csv(filepath_w)
 
+# Controleer de kolomnamen van bike_data om zeker te weten dat 'Start Date' correct is
+st.write("Kolomnamen van bike_data:", bike_data.columns)
+
+# Controleer of de kolomnaam correct is en pas eventueel aan
+if 'Start Date' in bike_data.columns:
+    bike_data['Start Date'] = pd.to_datetime(bike_data['Start Date'], errors='coerce')
+    bike_data['End Date'] = pd.to_datetime(bike_data['End Date'], errors='coerce')
+else:
+    st.error("'Start Date' kolom niet gevonden in bike_data. Controleer de kolomnamen.")
+    st.stop()
+
 # Converteer de datums naar datetime-indeling met foutafhandeling
-bike_data['Start Date'] = pd.to_datetime(bike_data['Start Date'], errors='coerce')
-bike_data['End Date'] = pd.to_datetime(bike_data['End Date'], errors='coerce')
 weather['Date'] = pd.to_datetime(weather['Date'], errors='coerce')
 
 # Verwijder rijen met NaT waarden na conversie
