@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-
+import plotly.graph_objects as go
 
 # Laad de metro datasets voor de verschillende jaren
 data_files = {
@@ -35,12 +34,10 @@ usage_df = pd.DataFrame(list(yearly_usage.items()), columns=['Jaar', 'Totaal_Geb
 usage_df['Totaal_Gebruik'] = usage_df['Totaal_Gebruik'] / 1e6
 
 # Bereken de groeisnelheid
-# We nemen de logaritme van de totale waarden om een lineaire relatie te krijgen voor exponentiële groei
 log_usage = np.log(usage_df['Totaal_Gebruik'])
 years = usage_df['Jaar'] - usage_df['Jaar'].min()
 
 # Gebruik een lineaire benadering voor de groeisnelheid
-# Met np.polyfit passen we een rechte lijn aan de logaritmische waarden
 slope, intercept = np.polyfit(years, log_usage, 1)
 
 # Bereken de voorspelde waarden voor de jaren tot 2023
@@ -51,15 +48,36 @@ predicted_usage = np.exp(predicted_log_usage)  # Exponent van de voorspelde log-
 # Maak een Streamlit-titel
 st.title('Metrogebruik van 2007 tot 2023 met Exponentiële Groei')
 
-# Plot de werkelijke data en de voorspelde data
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.scatter(usage_df['Jaar'], usage_df['Totaal_Gebruik'], label='Werkelijke Data', color='blue')
-ax.plot(np.arange(2007, 2024), predicted_usage, label='Exponentiële Groei (Voorspelling)', color='red', linestyle='--')
-ax.set_title('Metrogebruik van 2007 tot 2023 (in Miljoenen)', fontsize=16)
-ax.set_xlabel('Jaar', fontsize=12)
-ax.set_ylabel('Totaal Metrogebruik (Miljoenen)', fontsize=12)
-ax.legend()
-ax.grid(True)
+# Maak de interactieve plot met Plotly
+fig = go.Figure()
+
+# Voeg de werkelijke data toe
+fig.add_trace(go.Scatter(
+    x=usage_df['Jaar'],
+    y=usage_df['Totaal_Gebruik'],
+    mode='markers',
+    name='Werkelijke Data',
+    marker=dict(color='blue', size=10)
+))
+
+# Voeg de voorspelling toe
+fig.add_trace(go.Scatter(
+    x=np.arange(2007, 2024),
+    y=predicted_usage,
+    mode='lines',
+    name='Exponentiële Groei (Voorspelling)',
+    line=dict(color='red', dash='dash')
+))
+
+# Update layout van de grafiek
+fig.update_layout(
+    title='Metrogebruik van 2007 tot 2023 (in Miljoenen)',
+    xaxis_title='Jaar',
+    yaxis_title='Totaal Metrogebruik (Miljoenen)',
+    legend=dict(x=0.01, y=0.99),
+    hovermode='x unified'
+)
 
 # Toon de plot in Streamlit
-st.pyplot(fig)
+st.plotly_chart(fig)
+
