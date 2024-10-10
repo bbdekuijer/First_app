@@ -20,7 +20,7 @@ weather['Date'] = pd.to_datetime(weather['Date'])
 st.title('Fiets weer of niet?')
 
 # Locatielijst opstellen
-locations = bike_data['StartStation'].unique().tolist()
+locations = bike_data['StartStation Name'].unique().tolist()
 
 # Checkbox voor totaal
 show_total = st.sidebar.checkbox('Toon data voor alle locaties')
@@ -35,7 +35,7 @@ else:
 if selected_location == 'Totaal':
     filtered_bike_data = bike_data
 else:
-    filtered_bike_data = bike_data[bike_data['StartStation'] == selected_location]
+    filtered_bike_data = bike_data[bike_data['StartStation Name'] == selected_location]
 
 # Filter de weerdata op basis van de geselecteerde datum
 filtered_weather = weather[
