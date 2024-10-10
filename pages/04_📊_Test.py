@@ -74,7 +74,7 @@ fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_key], mod
 
 # Update layout voor dubbele Y-assen
 fig.update_layout(
-    title="Interactief Fietsgebruik en Weersdata",
+    title="Fietsgebruik tegen Weersdata",
     xaxis_title="Datum",
     yaxis=dict(
         title="Aantal ritten",
