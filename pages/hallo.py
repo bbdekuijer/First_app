@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # Volledig pad naar de CSV-bestanden
-filepath_b = ".devcontainer/334JourneyDataExtract07Sep2022-11Sep2022.csv"
+filepath_b = ".devcontainer/350JourneyDataExtract26Dec2022-01Jan2023.csv"
 filepath_w = ".devcontainer/df_temp_updated.csv"
 
 # Laden van de Bikeshare data en weerdata
