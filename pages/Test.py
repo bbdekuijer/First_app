@@ -33,10 +33,10 @@ rides_per_date['Date'] = pd.to_datetime(rides_per_date['Date'])
 df_combined = pd.merge(df_temp_filtered, rides_per_date, on='Date', how='left')
 
 # Zet de beschikbare variabelen in een lijst
-variables = ['tavg', 'tmin', 'tmax', 'prcp', 'wdir', 'wspd', 'pres']
+variables = ['tavg', 'tmin', 'tmax', 'prcp', 'wspd', 'pres']
 
 # Voeg een selectbox toe voor variabele selectie
-selected_variable = st.selectbox('Select a variable for the right Y-axis', variables)
+selected_variable = st.selectbox('Selecteer een variabele voor de rechter Y-as', variables)
 
 # Zorg ervoor dat de 'Date' kolom een datetime-object is
 df_combined['Date'] = pd.to_datetime(df_combined['Date'])
@@ -45,23 +45,23 @@ df_combined['Date'] = pd.to_datetime(df_combined['Date'])
 fig = go.Figure()
 
 # Voeg de 'ride_count' data toe aan de linker Y-as
-fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined['ride_count'], mode='lines', name='Ride Count', yaxis='y1'))
+fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined['ride_count'], mode='lines', name='Aantal ritten', yaxis='y1'))
 
 # Voeg de geselecteerde variabele toe aan de rechter Y-as
 fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_variable], mode='lines', name=selected_variable.capitalize(), yaxis='y2'))
 
 # Update layout voor dubbele Y-assen
 fig.update_layout(
-    title="Interactive Bike Usage and Weather Data",
-    xaxis_title="Date",
+    title="Interactief Fietsgebruik en Weersdata",
+    xaxis_title="Datum",
     yaxis=dict(
-        title="Ride Count",
+        title="Aantal ritten",
         titlefont=dict(color="blue"),
         tickfont=dict(color="blue"),
         side="left"
     ),
     yaxis2=dict(
-        title=selected_variable.capitalize(),
+        title="",
         titlefont=dict(color="green"),
         tickfont=dict(color="green"),
         overlaying='y',
@@ -70,6 +70,20 @@ fig.update_layout(
     legend=dict(x=0.01, y=0.99),
     hovermode="x"
 )
+
+# Voeg eenheden toe aan de rechter Y-as op basis van de geselecteerde variabele
+if selected_variable == 'tavg':
+    fig.layout.yaxis2.title = "Gemiddelde Temperatuur (°C)"
+elif selected_variable == 'tmin':
+    fig.layout.yaxis2.title = "Minimale Temperatuur (°C)"
+elif selected_variable == 'tmax':
+    fig.layout.yaxis2.title = "Maximale Temperatuur (°C)"
+elif selected_variable == 'prcp':
+    fig.layout.yaxis2.title = "Neerslag (mm)"
+elif selected_variable == 'wspd':
+    fig.layout.yaxis2.title = "Windsnelheid (km/u)"
+elif selected_variable == 'pres':
+    fig.layout.yaxis2.title = "Luchtdruk (hPa)"
 
 # Render de grafiek in Streamlit
 st.plotly_chart(fig)
