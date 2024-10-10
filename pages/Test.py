@@ -52,13 +52,25 @@ df_combined['Date'] = pd.to_datetime(df_combined['Date'])
 fig = go.Figure()
 
 # Voeg de 'ride_count' data toe aan de linker Y-as
-fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined['ride_count'], mode='lines', name='Aantal ritten', yaxis='y1'))
+fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined['ride_count'], mode='lines', name='Aantal ritten', yaxis='y1', line=dict(color='blue')))
 
 # Bepaal de geselecteerde sleutel op basis van de geselecteerde waarde
 selected_key = list(variable_names.keys())[list(variable_names.values()).index(selected_variable)]
 
-# Voeg de geselecteerde variabele toe aan de rechter Y-as
-fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_key], mode='lines', name=selected_variable, yaxis='y2'))
+# Voeg de geselecteerde variabele toe aan de rechter Y-as met bijbehorende kleur
+fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_key], mode='lines', name=selected_variable, yaxis='y2', line=dict(color=get_color(selected_key))))
+
+# Functie om kleur op basis van de geselecteerde variabele terug te geven
+def get_color(variable):
+    colors = {
+        'tavg': 'red',          # Gemiddelde temperatuur
+        'tmin': 'green',        # Minimale temperatuur
+        'tmax': 'orange',       # Maximale temperatuur
+        'prcp': 'purple',       # Neerslag
+        'wspd': 'cyan',         # Windsnelheid
+        'pres': 'brown'         # Luchtdruk
+    }
+    return colors.get(variable, 'black')  # Standaardkleur als variabele niet wordt herkend
 
 # Update layout voor dubbele Y-assen
 fig.update_layout(
@@ -72,8 +84,8 @@ fig.update_layout(
     ),
     yaxis2=dict(
         title="",
-        titlefont=dict(color="green"),
-        tickfont=dict(color="green"),
+        titlefont=dict(color=get_color(selected_key)),
+        tickfont=dict(color=get_color(selected_key)),
         overlaying='y',
         side='right'
     ),
