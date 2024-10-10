@@ -40,15 +40,16 @@ if selected_location == 'Totaal':
 else:
     filtered_bike_data = bike_data[bike_data['StartStation Name'] == selected_location]
 
-# Filter de weerdata op basis van de geselecteerde datum
-filtered_weather = weather[weather['Date'].dt.date.isin(filtered_bike_data['Start Date'].dt.date)]
-
 # Groepeer de gefilterde data per dag en tel het aantal ritten
 trips_per_day = filtered_bike_data.groupby(filtered_bike_data['Start Date'].dt.date).size().reset_index(name='Total Rides')
 
 # Voeg weerdata toe aan de fietsritten per dag
 trips_per_day['Start Date'] = pd.to_datetime(trips_per_day['Start Date'])
-merged_data = pd.merge(trips_per_day, filtered_weather, left_on='Start Date', right_on='Date', how='left')
+merged_data = pd.merge(trips_per_day, weather, left_on='Start Date', right_on='Date', how='left')
+
+# Filter merged_data voor de laatste 7 dagen
+last_7_days = merged_data['Start Date'].dt.date.unique()[-7:]  # Laatste 7 datums
+merged_data = merged_data[merged_data['Start Date'].dt.date.isin(last_7_days)]
 
 # Voeg een keuzemenu toe om te selecteren welke y-as weergeven wordt
 yaxis_option = st.sidebar.selectbox(
@@ -57,40 +58,37 @@ yaxis_option = st.sidebar.selectbox(
 )
 
 # Maak de plot met Plotly
-if 'fig' not in st.session_state:
-    fig = go.Figure()
+fig = go.Figure()
 
-    # Voeg fietsritten toe
-    fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['Total Rides'], mode='lines+markers', name='Fietsritten', line=dict(color='blue')))
+# Voeg fietsritten toe
+fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['Total Rides'], mode='lines+markers', name='Fietsritten', line=dict(color='blue')))
 
-    # Conditie voor het weergeven van de temperatuur of regenval
-    if yaxis_option == 'Gemiddelde Temperatuur':
-        fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
-    elif yaxis_option == 'Regenval':
-        fig.add_trace(go.Bar(x=merged_data['Start Date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
+# Conditie voor het weergeven van de temperatuur of regenval
+if yaxis_option == 'Gemiddelde Temperatuur':
+    fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
+elif yaxis_option == 'Regenval':
+    fig.add_trace(go.Bar(x=merged_data['Start Date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
 
-    # Update lay-out voor de plot
-    fig.update_layout(
-        title='Zo ging het eraan toe: {}'.format(selected_location),
-        xaxis_title='Datum',
-        yaxis_title='Aantal Ritten',
-        yaxis=dict(title='Aantal Ritten'),
-        yaxis2=dict(title='Gemiddelde Temperatuur (°C)', overlaying='y', side='right', position=0.99),
-        yaxis3=dict(title='Regenval (mm)', overlaying='y', side='right', position=0.99, showgrid=False),
-        legend_title='Legenda',
-        legend=dict(x=1.2, y=1, traceorder='normal', orientation='v'),
-        xaxis=dict(
-            tickmode='linear',
-            dtick='1 day',
-            tickformat='%Y-%m-%d',
-            tickangle=-45
-        )
+# Update lay-out voor de plot
+fig.update_layout(
+    title='Zo ging het eraan toe: {}'.format(selected_location),
+    xaxis_title='Datum',
+    yaxis_title='Aantal Ritten',
+    yaxis=dict(title='Aantal Ritten'),
+    yaxis2=dict(title='Gemiddelde Temperatuur (°C)', overlaying='y', side='right', position=0.99),
+    yaxis3=dict(title='Regenval (mm)', overlaying='y', side='right', position=0.99, showgrid=False),
+    legend_title='Legenda',
+    legend=dict(x=1.2, y=1, traceorder='normal', orientation='v'),
+    xaxis=dict(
+        tickmode='linear',
+        dtick='1 day',
+        tickformat='%Y-%m-%d',
+        tickangle=-45
     )
-
-    # Sla de figuur op in session_state
-    st.session_state.fig = fig
+)
 
 # Toon de plot in Streamlit
-st.plotly_chart(st.session_state.fig)
+st.plotly_chart(fig)
+
 
 
