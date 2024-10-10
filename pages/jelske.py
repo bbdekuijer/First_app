@@ -13,16 +13,19 @@ weather = weather.rename(columns={'Unnamed: 0': 'date'})
 weather = weather[['date', 'tavg', 'prcp', 'snow']].copy()
 weather = weather.fillna(0)
 
+# Pas de kolomnamen aan
+bike_data.columns = ["Number", "Start date", "Start station", "Start station", "End date", "End station number", "End station", "Bike number", "Bike model", "Total duration", "Total duration (ms)"]
+
 # Converteer de datums naar datetime-indeling
-bike_data['Start Date'] = pd.to_datetime(bike_data['Start Date'])
-bike_data['End Date'] = pd.to_datetime(bike_data['End Date'])
+bike_data['Start date'] = pd.to_datetime(bike_data['Start date'])
+bike_data['End date'] = pd.to_datetime(bike_data['End date'])
 weather['date'] = pd.to_datetime(weather['date'])
 
 # Titel van de Streamlit app
 st.title('Fiets weer of niet?')
 
 # Locatielijst opstellen
-locations = bike_data['StartStation Name'].unique().tolist()
+locations = bike_data['Start station'].unique().tolist()
 
 # Checkbox voor totaal
 show_total = st.sidebar.checkbox('Toon data voor alle locaties')
@@ -37,7 +40,7 @@ else:
 if selected_location == 'Totaal':
     filtered_bike_data = bike_data
 else:
-    filtered_bike_data = bike_data[bike_data['StartStation Name'] == selected_location]
+    filtered_bike_data = bike_data[bike_data['Start station'] == selected_location]
 
 # Filter de weerdata op basis van de geselecteerde datum
 filtered_weather = weather[
@@ -61,7 +64,7 @@ yaxis_option = st.sidebar.selectbox(
 fig = go.Figure()
 
 # Voeg fietsritten toe
-fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['Total Rides'], mode='lines+markers', name='Fietsritten', line=dict(color='blue')))
+fig.add_trace(go.Scatter(x=merged_data['Start date'], y=merged_data['Total Rides'], mode='lines+markers', name='Fietsritten', line=dict(color='blue')))
 
 # Conditie voor het weergeven van de temperatuur of regenval
 if yaxis_option == 'Gemiddelde Temperatuur':
@@ -89,4 +92,5 @@ fig.update_layout(
 
 # Toon de plot in Streamlit
 st.plotly_chart(fig)
+
 
