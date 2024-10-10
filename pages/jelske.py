@@ -8,10 +8,6 @@ filepath_w = ".devcontainer/weather_london.csv"
 
 # Laden van de Bikeshare data en weerdata
 bike_data = pd.read_csv(filepath_b)
-
-# Pas de kolomnamen aan
-bike_data.columns = ['Rental Id', 'Duration', 'Bike Id', 'End Date', 'EndStation Id', 'EndStation Name', 'Start Date', 'StartStation Id', 'StartStation Name']
-
 weather = pd.read_csv(filepath_w)
 weather = weather.rename(columns={'Unnamed: 0': 'date'})
 weather = weather[['date', 'tavg', 'prcp', 'snow']].copy()
@@ -45,15 +41,15 @@ else:
 
 # Filter de weerdata op basis van de geselecteerde datum
 filtered_weather = weather[
-    weather['date'].dt.date.isin(filtered_bike_data['Start Date'].dt.date)
+    weather['date'].dt.date.isin(filtered_bike_data['Start date'].dt.date)
 ]
 
 # Groepeer de gefilterde data per dag en tel het aantal ritten
-trips_per_day = filtered_bike_data.groupby(filtered_bike_data['Start Date'].dt.date).size().reset_index(name='Total Rides')
+trips_per_day = filtered_bike_data.groupby(filtered_bike_data['Start date'].dt.date).size().reset_index(name='Total Rides')
 
 # Voeg weerdata toe aan de fietsritten per dag
-trips_per_day['Start Date'] = pd.to_datetime(trips_per_day['Start Date'])
-merged_data = pd.merge(trips_per_day, filtered_weather, left_on='Start Date', right_on='date', how='left')
+trips_per_day['Start date'] = pd.to_datetime(trips_per_day['Start date'])
+merged_data = pd.merge(trips_per_day, filtered_weather, left_on='Start date', right_on='date', how='left')
 
 # Voeg een keuzemenu toe om te selecteren welke y-as weergeven wordt
 yaxis_option = st.sidebar.selectbox(
@@ -69,9 +65,9 @@ fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['Total Rides
 
 # Conditie voor het weergeven van de temperatuur of regenval
 if yaxis_option == 'Gemiddelde Temperatuur':
-    fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
+    fig.add_trace(go.Scatter(x=merged_data['Start date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
 elif yaxis_option == 'Regenval':
-    fig.add_trace(go.Bar(x=merged_data['Start Date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
+    fig.add_trace(go.Bar(x=merged_data['Start date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
 
 # Update lay-out voor de plot
 fig.update_layout(
