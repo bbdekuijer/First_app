@@ -140,13 +140,6 @@ for zone, color in zone_colors.items():
 
 # Voeg de laagbesturing (layer control) toe zodat de gebruiker lagen kan aan/uitzetten
 folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
-
-# Streamlit code
-st.title('London Underground Stations Map by Zone')
-
-# Toon de kaart in Streamlit
-st_data = st_folium(m, width=725, height=500)
-
 # Voeg de categorische legenda toe met Streamlit en positioneer het rechtsboven
 st.markdown('''
 <div style="position: fixed; 
@@ -165,5 +158,13 @@ st.markdown('''
      <i style="background:cyan;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 6<br>
 </div>
 ''', unsafe_allow_html=True)
+
+# Streamlit code
+st.title('London Underground Stations Map by Zone')
+
+# Toon de kaart in Streamlit
+st_data = st_folium(m, width=725, height=500)
+
+
 
 
