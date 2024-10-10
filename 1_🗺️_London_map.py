@@ -85,6 +85,91 @@ st.title('London Underground Stations Map by Zone')
 # Toon de kaart in Streamlit
 st_data = st_folium(m, width=725, height=500)
 
+
+import streamlit as st
+import folium
+import json
+from streamlit_folium import st_folium
+
+# Functie om een layer aan te maken voor een specifieke zone
+def create_zone_layer(stations_data, zone, map_object, color):
+    # Filter de stations voor de specifieke zone
+    zone_layer = folium.FeatureGroup(name=f'Zone {zone}').add_to(map_object)
+    
+    for station in stations_data['features']:
+        # Haal de zone van het station op
+        station_zone = station['properties']['zone']
+        
+        # Voeg alleen stations toe die in de specifieke zone zitten
+        if station_zone == zone:
+            coords = station['geometry']['coordinates']
+            name = station['properties']['name']
+            marker_color = station['properties']['marker-color']
+            
+            # Voeg cirkelmarkeringen toe voor elk station in deze zone
+            folium.Circle(
+                location=[coords[1], coords[0]],  # Gebruik lat en lng
+                popup=name,  # Laat de naam van het station zien
+                tooltip=f"Station: {name}, Zone: {station_zone}",  # Toon station en zone in de tooltip
+                color=marker_color,  # Gebruik de 'marker-color' als kleur voor de cirkel
+                fill=True,
+                fill_color=marker_color,  # Vulkleur gelijk aan de cirkelkleur
+                fill_opacity=0.7,  # Vul de cirkel met transparantie
+                radius=300  # Stel een vaste straal in
+            ).add_to(zone_layer)
+    
+    return map_object
+
+# Laad het JSON-bestand met stations (je moet het JSON-bestand in de juiste map plaatsen)
+with open('.devcontainer/London stations.json', 'r') as f:
+    stations_data = json.load(f)
+
+# Neutrale basemap voor Londen
+m = folium.Map(location=[51.5074, -0.1278], zoom_start=10, tiles='OpenStreetMap')
+
+# Voeg lagen toe voor elke zone (bijv. zone 1 tot 6)
+zone_colors = {
+    '1': 'red',
+    '2': 'orange',
+    '3': 'yellow',
+    '4': 'yellowgreen',
+    '5': 'green',
+    '6': 'cyan'
+}
+
+# Maak lagen aan voor elke zone en voeg ze toe aan de kaart
+for zone, color in zone_colors.items():
+    m = create_zone_layer(stations_data, zone, m, color)
+
+# Voeg de laagbesturing (layer control) toe zodat de gebruiker lagen kan aan/uitzetten
+folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
+
+# Streamlit code
+st.title('London Underground Stations Map by Zone')
+
+# Toon de kaart in Streamlit
+st_data = st_folium(m, width=725, height=500)
+
+# Voeg de categorische legenda toe met Streamlit en positioneer het rechtsboven
+st.markdown('''
+<div style="position: fixed; 
+            top: 10px; right: 10px; 
+            width: 150px; 
+            background-color: white; 
+            padding: 10px; 
+            border: 2px solid grey; 
+            z-index: 9999;">
+     <h4>Station Types</h4>
+     <i style="background:red;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 1<br>
+     <i style="background:orange;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 2<br>
+     <i style="background:yellow;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 3<br>
+     <i style="background:yellowgreen;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 4<br>
+     <i style="background:green;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 5<br>
+     <i style="background:cyan;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 6<br>
+</div>
+''', unsafe_allow_html=True)
+
+
 import streamlit as st
 import folium
 import json
@@ -171,4 +256,4 @@ st.title('London Underground Stations Map by Zone')
 
 # Toon de kaart in Streamlit
 st_data = st_folium(m, width=725, height=500)
-m
+
