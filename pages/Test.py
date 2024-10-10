@@ -2,6 +2,18 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
+# Functie om kleur op basis van de geselecteerde variabele terug te geven
+def get_color(variable):
+    colors = {
+        'tavg': 'red',          # Gemiddelde temperatuur
+        'tmin': 'green',        # Minimale temperatuur
+        'tmax': 'orange',       # Maximale temperatuur
+        'prcp': 'purple',       # Neerslag
+        'wspd': 'cyan',         # Windsnelheid
+        'pres': 'brown'         # Luchtdruk
+    }
+    return colors.get(variable, 'black')  # Standaardkleur als variabele niet wordt herkend
+
 # Pad naar de CSV bestanden in de .devcontainer map
 df_temp_updated = pd.read_csv('.devcontainer/df_temp_updated.csv')
 df_bike = pd.read_csv('.devcontainer/350JourneyDataExtract26Dec2022-01Jan2023.csv')
@@ -59,18 +71,6 @@ selected_key = list(variable_names.keys())[list(variable_names.values()).index(s
 
 # Voeg de geselecteerde variabele toe aan de rechter Y-as met bijbehorende kleur
 fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_key], mode='lines', name=selected_variable, yaxis='y2', line=dict(color=get_color(selected_key))))
-
-# Functie om kleur op basis van de geselecteerde variabele terug te geven
-def get_color(variable):
-    colors = {
-        'tavg': 'red',          # Gemiddelde temperatuur
-        'tmin': 'green',        # Minimale temperatuur
-        'tmax': 'orange',       # Maximale temperatuur
-        'prcp': 'purple',       # Neerslag
-        'wspd': 'cyan',         # Windsnelheid
-        'pres': 'brown'         # Luchtdruk
-    }
-    return colors.get(variable, 'black')  # Standaardkleur als variabele niet wordt herkend
 
 # Update layout voor dubbele Y-assen
 fig.update_layout(
