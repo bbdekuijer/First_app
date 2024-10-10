@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-streamlit run metro_exponential_growth_no_scipy.py
+
 
 
 # Laad de metro datasets voor de verschillende jaren
