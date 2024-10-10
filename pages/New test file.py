@@ -1,111 +1,94 @@
 import streamlit as st
-import plotly.graph_objects as go
 import pandas as pd
+import plotly.graph_objects as go
 
-# Functie om kleur op basis van de geselecteerde variabele terug te geven
-def get_color(variable):
-    colors = {
-        'tavg': 'orange',          # Gemiddelde temperatuur
-        'tmin': 'green',        # Minimale temperatuur
-        'tmax': 'red',       # Maximale temperatuur
-        'prcp': 'purple',       # Neerslag
-        'wspd': 'cyan',         # Windsnelheid
-        'pres': 'brown'         # Luchtdruk
-    }
-    return colors.get(variable, 'black')  # Standaardkleur als variabele niet wordt herkend
+# Volledig pad naar de CSV-bestanden
+filepath_b = ".devcontainer/334JourneyDataExtract07Sep2022-11Sep2022.csv"
+filepath_w = ".devcontainer/df_temp_updated.csv"
 
-# Pad naar de CSV bestanden in de .devcontainer map
-df_temp_updated = pd.read_csv('.devcontainer/df_temp_updated.csv')
-df_bike = pd.read_csv('.devcontainer/350JourneyDataExtract26Dec2022-01Jan2023.csv')
+# Laden van de Bikeshare data en weerdata
+bike_data = pd.read_csv(filepath_b)
+weather = pd.read_csv(filepath_w)
 
-# Zorg ervoor dat de 'Start date' al is geconverteerd naar datetime
-df_bike['Start date'] = pd.to_datetime(df_bike['Start date'])
+# Converteer de datums naar datetime-indeling met foutafhandeling
+bike_data['Start Date'] = pd.to_datetime(bike_data['Start Date'], errors='coerce')
+bike_data['End Date'] = pd.to_datetime(bike_data['End Date'], errors='coerce')
+weather['Date'] = pd.to_datetime(weather['Date'], errors='coerce')
 
-# Extraheren van de datum uit de 'Start date' kolom
-df_bike['Date'] = df_bike['Start date'].dt.date
+# Verwijder rijen met NaT waarden na conversie
+bike_data = bike_data.dropna(subset=['Start Date', 'End Date'])
+weather = weather.dropna(subset=['Date'])
 
-# Groeperen op datum en het aantal ritten tellen
-rides_per_date = df_bike.groupby('Date').size().reset_index(name='ride_count')
+# Titel van de Streamlit app
+st.title('Fiets weer of niet?')
 
-# Zorg ervoor dat de 'Date' kolom in df_temp_updated een datetime-object is
-df_temp_updated['Date'] = pd.to_datetime(df_temp_updated['Date'])
+# Locatielijst opstellen
+locations = bike_data['StartStation Name'].unique().tolist()
 
-# Selecteer de rijen waar de 'Date' tussen 2022-12-26 en 2023-01-01 ligt
-start_date = '2022-12-26'
-end_date = '2023-01-01'
+# Checkbox voor totaal
+show_total = st.sidebar.checkbox('Toon data voor alle locaties')
 
-# Filter de data voor de opgegeven datums
-df_temp_filtered = df_temp_updated[(df_temp_updated['Date'] >= start_date) & (df_temp_updated['Date'] <= end_date)]
+# Dropdown voor locatie-selectie, afhankelijk van de checkbox
+if show_total:
+    selected_location = 'Totaal'
+else:
+    selected_location = st.sidebar.selectbox('Selecteer een locatie', locations)
 
-# Zorg ervoor dat de 'Date' kolommen van beide DataFrames hetzelfde type hebben (datum object)
-df_temp_filtered.loc[:, 'Date'] = pd.to_datetime(df_temp_filtered['Date'])
-rides_per_date['Date'] = pd.to_datetime(rides_per_date['Date'])
+# Filter de data op basis van de geselecteerde locatie
+if selected_location == 'Totaal':
+    filtered_bike_data = bike_data
+else:
+    filtered_bike_data = bike_data[bike_data['StartStation Name'] == selected_location]
 
-# Merge de DataFrames op basis van de 'Date' kolom
-df_combined = pd.merge(df_temp_filtered, rides_per_date, on='Date', how='left')
+# Filter de weerdata op basis van de geselecteerde datum
+filtered_weather = weather[weather['Date'].dt.date.isin(filtered_bike_data['Start Date'].dt.date)]
 
-# Zet de beschikbare variabelen in een lijst met volledige namen
-variable_names = {
-    'tavg': 'Gemiddelde Temperatuur',
-    'tmin': 'Minimale Temperatuur',
-    'tmax': 'Maximale Temperatuur',
-    'prcp': 'Neerslag',
-    'wspd': 'Windsnelheid',
-    'pres': 'Luchtdruk'
-}
+# Groepeer de gefilterde data per dag en tel het aantal ritten
+trips_per_day = filtered_bike_data.groupby(filtered_bike_data['Start Date'].dt.date).size().reset_index(name='Total Rides')
 
-# Voeg een selectbox toe voor variabele selectie met de volledige namen
-selected_variable = st.selectbox('Selecteer een variabele voor de rechter Y-as', list(variable_names.values()))
+# Voeg weerdata toe aan de fietsritten per dag
+trips_per_day['Start Date'] = pd.to_datetime(trips_per_day['Start Date'])
+merged_data = pd.merge(trips_per_day, filtered_weather, left_on='Start Date', right_on='Date', how='left')
 
-# Zorg ervoor dat de 'Date' kolom een datetime-object is
-df_combined['Date'] = pd.to_datetime(df_combined['Date'])
-
-# Maak de interactieve grafiek met Plotly
-fig = go.Figure()
-
-# Voeg de 'ride_count' data toe aan de linker Y-as
-fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined['ride_count'], mode='lines', name='Aantal ritten', yaxis='y1', line=dict(color='blue')))
-
-# Bepaal de geselecteerde sleutel op basis van de geselecteerde waarde
-selected_key = list(variable_names.keys())[list(variable_names.values()).index(selected_variable)]
-
-# Voeg de geselecteerde variabele toe aan de rechter Y-as met bijbehorende kleur
-fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_key], mode='lines', name=selected_variable, yaxis='y2', line=dict(color=get_color(selected_key))))
-
-# Update layout voor dubbele Y-assen
-fig.update_layout(
-    title="Fietsgebruik tegen Weersdata",
-    xaxis_title="Datum",
-    yaxis=dict(
-        title="Aantal ritten",
-        titlefont=dict(color="blue"),
-        tickfont=dict(color="blue"),
-        side="left"
-    ),
-    yaxis2=dict(
-        title="",
-        titlefont=dict(color=get_color(selected_key)),
-        tickfont=dict(color=get_color(selected_key)),
-        overlaying='y',
-        side='right'
-    ),
-    legend=dict(x=0.01, y=0.99),
-    hovermode="x"
+# Voeg een keuzemenu toe om te selecteren welke y-as weergeven wordt
+yaxis_option = st.sidebar.selectbox(
+    'Selecteer welke gegevens je wil weergeven:',
+    options=['Gemiddelde Temperatuur', 'Regenval']
 )
 
-# Voeg eenheden toe aan de rechter Y-as op basis van de geselecteerde variabele
-if selected_key == 'tavg':
-    fig.layout.yaxis2.title = "Gemiddelde Temperatuur (°C)"
-elif selected_key == 'tmin':
-    fig.layout.yaxis2.title = "Minimale Temperatuur (°C)"
-elif selected_key == 'tmax':
-    fig.layout.yaxis2.title = "Maximale Temperatuur (°C)"
-elif selected_key == 'prcp':
-    fig.layout.yaxis2.title = "Neerslag (mm)"
-elif selected_key == 'wspd':
-    fig.layout.yaxis2.title = "Windsnelheid (km/u)"
-elif selected_key == 'pres':
-    fig.layout.yaxis2.title = "Luchtdruk (hPa)"
+# Maak de plot met Plotly
+fig = go.Figure()
+
+# Voeg fietsritten toe
+fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['Total Rides'], mode='lines+markers', name='Fietsritten', line=dict(color='blue')))
+
+# Conditie voor het weergeven van de temperatuur of regenval
+if yaxis_option == 'Gemiddelde Temperatuur':
+    fig.add_trace(go.Scatter(x=merged_data['Start Date'], y=merged_data['tavg'], mode='lines', name='Gemiddelde Temperatuur', line=dict(color='red'), yaxis='y2'))
+elif yaxis_option == 'Regenval':
+    fig.add_trace(go.Bar(x=merged_data['Start Date'], y=merged_data['prcp'], name='Regenval (mm)', yaxis='y3', opacity=0.5))
+
+# Update lay-out voor de plot
+fig.update_layout(
+    title='Zo ging het eraan toe: {}'.format(selected_location),
+    xaxis_title='Datum',
+    yaxis_title='Aantal Ritten',
+    yaxis=dict(title='Aantal Ritten'),
+    yaxis2=dict(title='Gemiddelde Temperatuur (°C)', overlaying='y', side='right', position=0.99),  # Y-as voor temperatuur verder naar rechts
+    yaxis3=dict(title='Regenval (mm)', overlaying='y', side='right', position=0.99, showgrid=False),  # Y-as voor regenval verder naar rechts buiten het plotgebied
+    legend_title='Legenda',
+    legend=dict(x=1.2, y=1, traceorder='normal', orientation='v'),  # Legenda buiten de grafiek
+    xaxis=dict(
+        tickmode='linear',
+        dtick='1 day',
+        tickformat='%Y-%m-%d',
+        tickangle=-45
+    )
+)
+
+# Toon de plot in Streamlit
+st.plotly_chart(fig)
+
 
 # Render de grafiek in Streamlit
 st.plotly_chart(fig)
