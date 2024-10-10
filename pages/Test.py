@@ -32,11 +32,18 @@ rides_per_date['Date'] = pd.to_datetime(rides_per_date['Date'])
 # Merge de DataFrames op basis van de 'Date' kolom
 df_combined = pd.merge(df_temp_filtered, rides_per_date, on='Date', how='left')
 
-# Zet de beschikbare variabelen in een lijst
-variables = ['tavg', 'tmin', 'tmax', 'prcp', 'wspd', 'pres']
+# Zet de beschikbare variabelen in een lijst met volledige namen
+variable_names = {
+    'tavg': 'Gemiddelde Temperatuur',
+    'tmin': 'Minimale Temperatuur',
+    'tmax': 'Maximale Temperatuur',
+    'prcp': 'Neerslag',
+    'wspd': 'Windsnelheid',
+    'pres': 'Luchtdruk'
+}
 
-# Voeg een selectbox toe voor variabele selectie
-selected_variable = st.selectbox('Selecteer een variabele voor de rechter Y-as', variables)
+# Voeg een selectbox toe voor variabele selectie met de volledige namen
+selected_variable = st.selectbox('Selecteer een variabele voor de rechter Y-as', list(variable_names.values()))
 
 # Zorg ervoor dat de 'Date' kolom een datetime-object is
 df_combined['Date'] = pd.to_datetime(df_combined['Date'])
@@ -47,8 +54,11 @@ fig = go.Figure()
 # Voeg de 'ride_count' data toe aan de linker Y-as
 fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined['ride_count'], mode='lines', name='Aantal ritten', yaxis='y1'))
 
+# Bepaal de geselecteerde sleutel op basis van de geselecteerde waarde
+selected_key = list(variable_names.keys())[list(variable_names.values()).index(selected_variable)]
+
 # Voeg de geselecteerde variabele toe aan de rechter Y-as
-fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_variable], mode='lines', name=selected_variable.capitalize(), yaxis='y2'))
+fig.add_trace(go.Scatter(x=df_combined['Date'], y=df_combined[selected_key], mode='lines', name=selected_variable, yaxis='y2'))
 
 # Update layout voor dubbele Y-assen
 fig.update_layout(
@@ -72,17 +82,17 @@ fig.update_layout(
 )
 
 # Voeg eenheden toe aan de rechter Y-as op basis van de geselecteerde variabele
-if selected_variable == 'tavg':
+if selected_key == 'tavg':
     fig.layout.yaxis2.title = "Gemiddelde Temperatuur (°C)"
-elif selected_variable == 'tmin':
+elif selected_key == 'tmin':
     fig.layout.yaxis2.title = "Minimale Temperatuur (°C)"
-elif selected_variable == 'tmax':
+elif selected_key == 'tmax':
     fig.layout.yaxis2.title = "Maximale Temperatuur (°C)"
-elif selected_variable == 'prcp':
+elif selected_key == 'prcp':
     fig.layout.yaxis2.title = "Neerslag (mm)"
-elif selected_variable == 'wspd':
+elif selected_key == 'wspd':
     fig.layout.yaxis2.title = "Windsnelheid (km/u)"
-elif selected_variable == 'pres':
+elif selected_key == 'pres':
     fig.layout.yaxis2.title = "Luchtdruk (hPa)"
 
 # Render de grafiek in Streamlit
