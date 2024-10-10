@@ -7,3 +7,4 @@ streamlit
 streamlit-folium
 plotly
 scipy
+plotly.graph_objects
