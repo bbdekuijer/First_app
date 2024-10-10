@@ -19,7 +19,7 @@ bike_data['End date'] = pd.to_datetime(bike_data['End date'])
 weather['date'] = pd.to_datetime(weather['date'])
 
 # Titel van de Streamlit app
-st.title('Fiets weer of niet?')
+st.title('Gunstige weersomstandigheden om te fietsen?')
 
 # Locatielijst opstellen
 locations = bike_data['Start station'].unique().tolist()
