@@ -84,6 +84,7 @@ st.title('London Underground Stations Map by Zone')
 
 # Toon de kaart in Streamlit
 st_data = st_folium(m, width=725, height=500)
+m
 
 import streamlit as st
 import folium
