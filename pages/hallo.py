@@ -10,19 +10,13 @@ filepath_w = ".devcontainer/df_temp_updated.csv"
 bike_data = pd.read_csv(filepath_b)
 weather = pd.read_csv(filepath_w)
 
-# Controleer de kolomnamen van bike_data
+# Afdrukken van de kolomnamen om te controleren hoe ze zijn geschreven
 st.write("Kolomnamen van bike_data:", bike_data.columns)
 
-# Pas hier de juiste kolomnaam aan als het nodig is
-if 'Start date' in bike_data.columns:
-    bike_data['Start date'] = pd.to_datetime(bike_data['Start date'], errors='coerce').dt.date
-    bike_data['End date'] = pd.to_datetime(bike_data['End date'], errors='coerce').dt.date
-else:
-    st.error("'Start date' kolom niet gevonden in bike_data. Controleer de kolomnamen.")
-    st.stop()
-
-# Converteer de datums in de weerdata naar datetime en houd alleen de datum
-weather['Date'] = pd.to_datetime(weather['Date'], errors='coerce').dt.date
+# Converteer de datums naar datetime-indeling met foutafhandeling
+bike_data['Start date'] = pd.to_datetime(bike_data['Start date'], errors='coerce')
+bike_data['End date'] = pd.to_datetime(bike_data['End date'], errors='coerce')
+weather['Date'] = pd.to_datetime(weather['Date'], errors='coerce')
 
 # Verwijder rijen met NaT waarden na conversie
 bike_data = bike_data.dropna(subset=['Start date', 'End date'])
@@ -32,7 +26,7 @@ weather = weather.dropna(subset=['Date'])
 st.title('Fiets weer of niet?')
 
 # Locatielijst opstellen
-locations = bike_data['StartStation Name'].unique().tolist()
+locations = bike_data['Start station'].unique().tolist()
 
 # Checkbox voor totaal
 show_total = st.sidebar.checkbox('Toon data voor alle locaties')
@@ -47,17 +41,18 @@ else:
 if selected_location == 'Totaal':
     filtered_bike_data = bike_data
 else:
-    filtered_bike_data = bike_data[bike_data['StartStation Name'] == selected_location]
+    filtered_bike_data = bike_data[bike_data['Start station'] == selected_location]
 
 # Groepeer de gefilterde data per dag en tel het aantal ritten
-trips_per_day = filtered_bike_data.groupby('Start date').size().reset_index(name='Total Rides')
+trips_per_day = filtered_bike_data.groupby(filtered_bike_data['Start date'].dt.date).size().reset_index(name='Total Rides')
 
 # Voeg weerdata toe aan de fietsritten per dag
+trips_per_day['Start date'] = pd.to_datetime(trips_per_day['Start date'])
 merged_data = pd.merge(trips_per_day, weather, left_on='Start date', right_on='Date', how='left')
 
 # Filter merged_data voor de laatste 7 unieke dagen
-last_7_days = merged_data['Start date'].unique()[-7:]  # Laatste 7 unieke datums
-merged_data = merged_data[merged_data['Start date'].isin(last_7_days)]
+last_7_days = merged_data['Start date'].dt.date.unique()[-7:]  # Laatste 7 unieke datums
+merged_data = merged_data[merged_data['Start date'].dt.date.isin(last_7_days)]
 
 # Voeg een keuzemenu toe om te selecteren welke y-as weergeven wordt
 yaxis_option = st.sidebar.selectbox(
@@ -89,7 +84,7 @@ fig.update_layout(
     legend=dict(x=1.2, y=1, traceorder='normal', orientation='v'),
     xaxis=dict(
         tickmode='array',  # Specifieke ticks voor de x-as
-        tickvals=merged_data['Start date'].unique(),  # Unieke datums voor de laatste 7 dagen
+        tickvals=merged_data['Start date'].dt.date.unique(),  # Unieke datums voor de laatste 7 dagen
         tickformat='%Y-%m-%d',
         tickangle=-45
     )
