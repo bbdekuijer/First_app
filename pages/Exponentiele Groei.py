@@ -4,8 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
-
 # Laad de metro datasets voor de verschillende jaren
 data_files = {
     2017: '.devcontainer/2017_Entry_Exit.csv',
