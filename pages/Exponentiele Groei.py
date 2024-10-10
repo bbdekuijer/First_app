@@ -1,8 +1,11 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import scipy
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+pip install scipy
+
 
 # Definieer het exponentiële groeimodel
 def exponential_growth(x, a, b):
