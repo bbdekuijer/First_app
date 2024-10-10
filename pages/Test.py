@@ -5,9 +5,9 @@ import pandas as pd
 # Functie om kleur op basis van de geselecteerde variabele terug te geven
 def get_color(variable):
     colors = {
-        'tavg': 'red',          # Gemiddelde temperatuur
+        'tavg': 'orange',          # Gemiddelde temperatuur
         'tmin': 'green',        # Minimale temperatuur
-        'tmax': 'orange',       # Maximale temperatuur
+        'tmax': 'red',       # Maximale temperatuur
         'prcp': 'purple',       # Neerslag
         'wspd': 'cyan',         # Windsnelheid
         'pres': 'brown'         # Luchtdruk
