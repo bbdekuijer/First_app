@@ -14,7 +14,7 @@ weather = pd.read_csv(filepath_w)
 # Converteer de datums naar datetime-indeling
 bike_data['Start date'] = pd.to_datetime(bike_data['Start date'])
 bike_data['End date'] = pd.to_datetime(bike_data['End date'])
-weather['date'] = pd.to_datetime(weather['date'])
+weather['Date'] = pd.to_datetime(weather['date'])
 
 # Titel van de Streamlit app
 st.title('Fiets weer of niet?')
