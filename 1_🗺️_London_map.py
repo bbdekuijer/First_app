@@ -1,107 +1,207 @@
 import streamlit as st
-import folium
-import json
-from streamlit_folium import st_folium
+import plotly.graph_objects as go
+import pandas as pd
 
+# Load the data
+sb = pd.read_csv('A5SBIntensiteit.csv')
+nb = pd.read_csv('A5NBIntensiteit.csv')
 
-# Functie om een layer aan te maken voor een specifieke zone
-def create_zone_layer(stations_data, zone, map_object, color):
-    # Filter de stations voor de specifieke zone
-    zone_layer = folium.FeatureGroup(name=f'Zone {zone}').add_to(map_object)
-    
-    for station in stations_data['features']:
-        # Haal de zone van het station op
-        station_zone = station['properties']['zone']
-        
-        # Voeg alleen stations toe die in de specifieke zone zitten
-        if station_zone == zone:
-            coords = station['geometry']['coordinates']
-            name = station['properties']['name']
-            marker_color = station['properties']['marker-color']
-            
-            # Voeg cirkelmarkeringen toe voor elk station in deze zone
-            folium.Circle(
-                location=[coords[1], coords[0]],  # Gebruik lat en lng
-                popup=name,  # Laat de naam van het station zien
-                tooltip=f"Station: {name}, Zone: {station_zone}",  # Toon station en zone in de tooltip
-                color=marker_color,  # Gebruik de 'marker-color' als kleur voor de cirkel
-                fill=True,
-                fill_color=marker_color,  # Vulkleur gelijk aan de cirkelkleur
-                fill_opacity=0.7,  # Vul de cirkel met transparantie
-                radius=300  # Stel een vaste straal in
-            ).add_to(zone_layer)
-    
-    return map_object
+# Filter for 'greaterThan 12.20' category
+sb = sb[sb['voertuigcategorie'] == 'greaterThan 12.20']
+nb = nb[nb['voertuigcategorie'] == 'greaterThan 12.20']
 
-# Functie om een categorische legenda aan de kaart toe te voegen
-def add_categorical_legend(map_object, title, colors, labels):
-    legend_html = f'''
-     <div style="position: fixed; 
-     top: 10px; right: 10px; width: 150px; height: 180px; 
-     background-color: white; z-index:9999; font-size:14px;
-     padding: 10px;
-     border: 2px solid grey;
-     ">
-     <h4>{title}</h4>
-     '''
-    for color, label in zip(colors, labels):
-        legend_html += f'<i style="background:{color};width:18px;height:18px;float:left;margin-right:10px;"></i> {label}<br>'
-    legend_html += '</div>'
-    map_object.get_root().html.add_child(folium.Element(legend_html))
-    return map_object
+# Group and pivot the data
+sb = sb.groupby(['start_meetperiode', 'id_meetlocatie']).agg('sum')['gem_intensiteit'].unstack(level='id_meetlocatie')
+nb = nb.groupby(['start_meetperiode', 'id_meetlocatie']).agg('sum')['gem_intensiteit'].unstack(level='id_meetlocatie')
 
-# Laad het JSON-bestand met stations (je moet het JSON-bestand in de juiste map plaatsen)
-with open('.devcontainer/London stations.json', 'r') as f:
-    stations_data = json.load(f)
+# Merge the dataframes
+df = sb.merge(nb, on='start_meetperiode', how='inner')
 
-# Neutrale basemap voor Londen
-m = folium.Map(location=[51.5074, -0.1278], zoom_start=10, tiles='OpenStreetMap')
-
-# Voeg lagen toe voor elke zone (bijv. zone 1 tot 6)
-zone_colors = {
-    '1': 'red',
-    '2': 'orange',
-    '3': 'yellow',
-    '4': 'yellowgreen',
-    '5': 'green',
-    '6': 'cyan'
+# Rename columns
+rename = {
+    'RWS01_MONICA_00D005026028D0050005': 'SB voor afr 3',
+    'RWS01_MONICA_00D005026028D0050009': 'SB voor afr 3_2',
+    'RWS01_MONICA_00D005024C2FD0050005': 'SB tussen afop 3',
+    'RWS01_MONICA_00D005024C2FD0050009': 'SB tussen afop 3_2',
+    'RWS01_MONICA_00D005023C4AD0050005': 'SB na opr 3',
+    'RWS01_MONICA_00D005023C4AD0050009': 'SB na opr 3_2',
+    'RWS01_MONICA_00D005023C4AD0050305': 'SB na opr 3_3',
+    'RWS01_MONICA_00D005022415D0050005': 'SB tussen afop 2',
+    'RWS01_MONICA_00D005022415D0050009': 'SB tussen afop 2_2',
+    'RWS01_MONICA_00D005020442D0050005': 'SB na opr 2',
+    'RWS01_MONICA_00D005020442D0050009': 'SB na opr 2_2',
+    'RWS01_MONICA_00D005020442D007000B': 'NB voor afr 2',
+    'RWS01_MONICA_00D005020442D0070007': 'NB voor afr 2_2',
+    'RWS01_MONICA_00D005021841D007000B': 'NB tussen afop 2',
+    'RWS01_MONICA_00D005021841D0070007': 'NB tussen afop 2_2',
+    'RWS01_MONICA_00D005023047D007000B': 'NB na opr 2',
+    'RWS01_MONICA_00D005023047D0070007': 'NB na opr 2_2',
+    'RWS01_MONICA_00D005023047D0070307': 'NB na opr 2_3',
+    'RWS01_MONICA_00D005024C43D007000B': 'NB tussen afop 3',
+    'RWS01_MONICA_00D005024C43D0070007': 'NB tussen afop 3_2',
+    'RWS01_MONICA_00D005026041D007000B': 'NB na opr 3',
+    'RWS01_MONICA_00D005026041D0070007': 'NB na opr 3_2'
 }
+df = df.rename(columns=rename)
 
-# Maak lagen aan voor elke zone en voeg ze toe aan de kaart
-for zone, color in zone_colors.items():
-    m = create_zone_layer(stations_data, zone, m, color)
+# Calculate ingaand values
+df['SB ingaand 2'] = (df['SB na opr 3'] + df['SB na opr 3_2'] + df['SB na opr 3_3']) - (df['SB tussen afop 2'] + df['SB tussen afop 2_2'])
+df['SB ingaand 3'] = (df['SB voor afr 3'] + df['SB voor afr 3_2']) - (df['SB tussen afop 3'] + df['SB tussen afop 3_2'])
+df['NB ingaand 2'] = (df['NB voor afr 2'] + df['NB voor afr 2_2']) - (df['NB tussen afop 2'] + df['NB tussen afop 2_2'])
+df['NB ingaand 3'] = (df['NB na opr 2'] + df['NB na opr 2_2'] + df['NB na opr 2_3']) - (df['NB tussen afop 3'] + df['NB tussen afop 3_2'])
+df['ingaand'] = df['SB ingaand 2'] + df['SB ingaand 3'] + df['NB ingaand 2'] + df['NB ingaand 3']
 
-# Voeg de categorische legenda toe
-m = add_categorical_legend(m, 'Station Types', 
-                           colors=['red', 'orange', 'yellow', 'yellowgreen', 'green', 'cyan'], 
-                           labels=['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6'])
+# Calculate uitgaand values
+df['SB uitgaand 3'] = (df['SB na opr 3'] + df['SB na opr 3_2'] + df['SB na opr 3_3']) - (df['SB tussen afop 3'] + df['SB tussen afop 3_2'])
+df['SB uitgaand 2'] = (df['SB na opr 2'] + df['SB na opr 2_2']) - (df['SB tussen afop 2'] + df['SB tussen afop 2_2'])
+df['NB uitgaand 2'] = (df['NB na opr 2'] + df['NB na opr 2_2'] + df['NB na opr 2_3']) - (df['NB tussen afop 2'] + df['NB tussen afop 2_2'])
+df['NB uitgaand 3'] = (df['NB na opr 3'] + df['NB na opr 3_2']) - (df['NB tussen afop 3'] + df['NB tussen afop 3_2'])
+df['uitgaand'] = df['SB uitgaand 2'] + df['SB uitgaand 3'] + df['NB uitgaand 2'] + df['NB uitgaand 3']
 
-# Voeg de laagbesturing (layer control) toe zodat de gebruiker lagen kan aan/uitzetten
-folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
+# Streamlit app
+st.title('Traffic Flow Analysis - Ingaand and Uitgaand')
 
-# Voeg de categorische legenda toe met Streamlit en positioneer het rechtsboven
-st.markdown('''
-<div style="position: fixed; 
-            top: 10px; right: 10px; 
-            width: 150px; 
-            background-color: white; 
-            padding: 10px; 
-            border: 2px solid grey; 
-            z-index: 9999;">
-     <h4>Station Types</h4>
-     <i style="background:red;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 1<br>
-     <i style="background:orange;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 2<br>
-     <i style="background:yellow;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 3<br>
-     <i style="background:yellowgreen;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 4<br>
-     <i style="background:green;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 5<br>
-     <i style="background:cyan;width:18px;height:18px;float:left;margin-right:10px;"></i> Zone 6<br>
-</div>
-''', unsafe_allow_html=True)
+# Convert index to datetime
+df.index = pd.to_datetime(df.index)
 
+# Date range selector
+min_date = df.index.min().date()
+max_date = df.index.max().date()
+start_date = st.date_input('Start date', min_date)
+end_date = st.date_input('End date', max_date)
 
-# Streamlit code
-st.title('London Underground Stations Map by Zone')
+# Convert to datetime
+start_date = pd.to_datetime(start_date)
+end_date = pd.to_datetime(end_date)
 
-# Toon de kaart in Streamlit
-st_data = st_folium(m, width=725, height=500)
+# Filter data based on date range
+mask = (df.index >= start_date) & (df.index <= end_date)
+filtered_df = df.loc[mask]
 
+# Group by options
+group_by = st.selectbox('Group by', ['Day', 'Week', 'Month', 'Weekday'])
+
+if group_by == 'Day':
+    grouped_df = filtered_df
+elif group_by == 'Week':
+    grouped_df = filtered_df.resample('W').sum()
+elif group_by == 'Month':
+    grouped_df = filtered_df.resample('M').sum()
+elif group_by == 'Weekday':
+    grouped_df = filtered_df.groupby(filtered_df.index.weekday).sum()
+    grouped_df.index = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+# Calculate relative intensity (max value = 100%) for both ingaand and uitgaand
+max_intensity = max(grouped_df['ingaand'].max(), grouped_df['uitgaand'].max())
+grouped_df['relative_intensity_ingaand'] = (grouped_df['ingaand'] / max_intensity) * 100
+grouped_df['relative_intensity_uitgaand'] = (grouped_df['uitgaand'] / max_intensity) * 100
+
+# Checkbox for switching between relative and absolute values
+use_relative_values = st.checkbox('Use Relative Values', value=True)
+
+# Create plot
+fig1 = go.Figure()
+
+# Add bar traces for intensity
+if use_relative_values:
+    fig1.add_trace(go.Bar(x=grouped_df.index, y=grouped_df['relative_intensity_ingaand'], name='Ingaand'))
+    fig1.add_trace(go.Bar(x=grouped_df.index, y=grouped_df['relative_intensity_uitgaand'], name='Uitgaand'))
+    y_axis_title = 'Relative Intensity (%)'
+else:
+    fig1.add_trace(go.Bar(x=grouped_df.index, y=grouped_df['ingaand'], name='Ingaand'))
+    fig1.add_trace(go.Bar(x=grouped_df.index, y=grouped_df['uitgaand'], name='Uitgaand'))
+    y_axis_title = 'Absolute Intensity'
+
+# Update layout
+fig1.update_layout(title=f'{"Relative" if use_relative_values else "Absolute"} Traffic Flow ({group_by})',
+                  xaxis_title='Date' if group_by != 'Weekday' else 'Day of Week',
+                  yaxis_title=y_axis_title,
+                  legend_title='Traffic Type',
+                  yaxis=dict(range=[0, 100]) if use_relative_values else dict(),
+                  barmode='group')  # Group bars side by side
+
+# Display the plot
+st.plotly_chart(fig1)
+
+# Display raw data
+if st.checkbox('Show raw data'):
+    if use_relative_values:
+        st.write(grouped_df[['ingaand', 'uitgaand', 'relative_intensity_ingaand', 'relative_intensity_uitgaand']])
+    else:
+        st.write(grouped_df[['ingaand', 'uitgaand']])
+
+# New plot for average intensity per hour for selected weekday
+st.subheader('Average Intensity per Hour for Selected Weekday')
+
+# Prepare data for hourly weekday plot
+filtered_df['hour'] = filtered_df.index.hour
+filtered_df['weekday'] = filtered_df.index.weekday
+
+# Dropdown for weekday selection
+weekday_map = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
+selected_weekday = st.selectbox('Select Weekday', list(weekday_map.values()))
+
+# Filter data for selected weekday
+selected_weekday_data = filtered_df[filtered_df['weekday'] == list(weekday_map.keys())[list(weekday_map.values()).index(selected_weekday)]]
+
+# Calculate average intensity per hour for selected weekday for both traffic types
+hourly_avg_ingaand = selected_weekday_data.groupby('hour')['ingaand'].mean()
+hourly_avg_uitgaand = selected_weekday_data.groupby('hour')['uitgaand'].mean()
+
+# Calculate relative intensity (max value = 100%) for both traffic types
+max_hourly_intensity = max(hourly_avg_ingaand.max(), hourly_avg_uitgaand.max())
+hourly_relative_intensity_ingaand = (hourly_avg_ingaand / max_hourly_intensity) * 100
+hourly_relative_intensity_uitgaand = (hourly_avg_uitgaand / max_hourly_intensity) * 100
+
+# Checkbox for switching between relative and absolute values for hourly plot
+use_relative_values_hourly = st.checkbox('Use Relative Values for Hourly Plot', value=True)
+
+# Create bar plot for selected weekday showing both traffic types
+fig2 = go.Figure()
+
+if use_relative_values_hourly:
+    fig2.add_trace(go.Bar(x=[f"{i:02d}:00" for i in range(24)], 
+                          y=hourly_relative_intensity_ingaand, 
+                          name='Ingaand',
+                          marker_color='blue'))
+    fig2.add_trace(go.Bar(x=[f"{i:02d}:00" for i in range(24)], 
+                          y=hourly_relative_intensity_uitgaand, 
+                          name='Uitgaand',
+                          marker_color='red'))
+    y_axis_title_hourly = 'Relative Intensity (%)'
+else:
+    fig2.add_trace(go.Bar(x=[f"{i:02d}:00" for i in range(24)], 
+                          y=hourly_avg_ingaand, 
+                          name='Ingaand',
+                          marker_color='blue'))
+    fig2.add_trace(go.Bar(x=[f"{i:02d}:00" for i in range(24)], 
+                          y=hourly_avg_uitgaand, 
+                          name='Uitgaand',
+                          marker_color='red'))
+    y_axis_title_hourly = 'Absolute Intensity'
+
+fig2.update_layout(title=f'Average {"Relative" if use_relative_values_hourly else "Absolute"} Intensity per Hour on {selected_weekday}',
+                   xaxis_title='Hour of Day',
+                   yaxis_title=y_axis_title_hourly,
+                   yaxis=dict(range=[0, 100]) if use_relative_values_hourly else dict(),
+                   barmode='group',  # Group bars side by side
+                   legend_title='Traffic Type')
+
+# Display the hourly plot
+st.plotly_chart(fig2)
+
+# Option to display raw hourly data
+if st.checkbox('Show raw hourly data'):
+    if use_relative_values_hourly:
+        hourly_data = pd.DataFrame({
+            'Hour': range(24),
+            'Ingaand (%)': hourly_relative_intensity_ingaand,
+            'Uitgaand (%)': hourly_relative_intensity_uitgaand
+        })
+    else:
+        hourly_data = pd.DataFrame({
+            'Hour': range(24),
+            'Ingaand': hourly_avg_ingaand,
+            'Uitgaand': hourly_avg_uitgaand
+        })
+    st.write(hourly_data)
