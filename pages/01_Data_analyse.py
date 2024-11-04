@@ -27,7 +27,6 @@ with col2:
 
 # Sectie voor NaN-verdeling met staafdiagram
 st.subheader("Verdeling van Missende Waarden per Kolom")
-
 # Maak een dataframe dat telt hoeveel NaN's er in elke kolom zitten
 nan_data = pd.DataFrame(data.isna().sum(), columns=['NaN Count']).reset_index()
 nan_data.columns = ['Column', 'NaN Count']
@@ -49,24 +48,24 @@ pclass = st.selectbox("Selecteer een passagiersklasse:", pclass_options)
 # Filter de data op basis van de geselecteerde klasse en verwijder NaN-waarden in de Age kolom
 filtered_data = data[(data['Pclass'] == pclass) & (data['Age'].notna())]
 
-# Maak de histogram met de oorspronkelijke kleuren en vaste x-as limieten
+# Maak de histogram met vaste x-as limieten, bin-grootte en kleuren
 fig_age_dist = px.histogram(
     filtered_data,
     x='Age',
-    nbins=16,
     title=f"Leeftijdsdistributie voor Passagiers in Klasse {pclass}",
     labels={'Age': 'Leeftijd'},
     color='Survived',
-    color_discrete_sequence=['#FFA07A', '#90EE90'],  
+    color_discrete_sequence=['#FFA07A', '#90EE90'],  # Kleuren: zacht oranje en lichtgroen
     category_orders={'Survived': [0, 1]}
 )
 
-# Voeg een legenda toe en stel de x-as limiet vast
+# Forceer de bin-grootte op 5 (zodat 80/5 = 16 bins) en stel de x-as vast van 0 tot 80
+fig_age_dist.update_traces(xbins=dict(start=0, end=80, size=5))
 fig_age_dist.update_layout(
     legend_title_text='Overleving',
     xaxis_title='Leeftijd',
     yaxis_title='Aantal Passagiers',
-    xaxis=dict(range=[0, 80])  
+    xaxis=dict(range=[0, 80])  # Stel de x-as limiet vast van 0 tot 80
 )
 
 # Weergave van de grafiek
