@@ -6,19 +6,14 @@ st.title("Titanic Data Analyse App")
 # Introductie
 st.write("Welkom bij de Titanic Data Analyse App! Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren.")
 
-# Navigatie
-st.sidebar.title("Navigatie")
-page = st.sidebar.radio("Selecteer een sectie:", ["Data Analyse", "Visualisatie", "Algoritme"])
+# Afbeelding van de Titanic
+st.image("Afbeeldingen/Titanic.jpg", use_column_width=True)  # Zorg ervoor dat het pad naar je afbeelding correct is
 
-if page == "Data Analyse":
-    st.markdown("Ga naar de pagina voor Data Analyse.")
-    st.write("Hier kun je gegevens verkennen en basisstatistieken bekijken.")
+# Secties zonder navigatie
+st.header("Secties:")
+st.write("[Data Analyse](pages/01_Data_analyse.py)")
+st.write("[Visualisatie](pages/02_Visualisatie.py)")
+st.write("[Algoritme](pages/03_Algoritme.py)")
 
-elif page == "Visualisatie":
-    st.markdown("Ga naar de pagina voor Visualisatie.")
-    st.write("Hier kun je grafieken en visualisaties bekijken.")
-
-elif page == "Algoritme":
-    st.markdown("Ga naar de pagina voor Algoritme.")
-    st.write("Hier kun je machine learning modellen toepassen.")
-
+# Korte uitleg over de secties
+st.write("Kies een van de bovenstaande secties om verder te gaan met de analyse, visualisatie of machine learning van de Titanic dataset.")
