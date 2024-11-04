@@ -27,6 +27,7 @@ with col2:
 
 # Sectie voor NaN-verdeling met staafdiagram
 st.subheader("Verdeling van Missende Waarden per Kolom")
+
 # Maak een dataframe dat telt hoeveel NaN's er in elke kolom zitten
 nan_data = pd.DataFrame(data.isna().sum(), columns=['NaN Count']).reset_index()
 nan_data.columns = ['Column', 'NaN Count']
@@ -52,11 +53,11 @@ filtered_data = data[(data['Pclass'] == pclass) & (data['Age'].notna())]
 fig_age_dist = px.histogram(
     filtered_data,
     x='Age',
-    nbins=30,
+    nbins=16,
     title=f"Leeftijdsdistributie voor Passagiers in Klasse {pclass}",
     labels={'Age': 'Leeftijd'},
     color='Survived',
-    color_discrete_sequence=['#FFA07A', '#90EE90'],  # Kleuren: zacht oranje en lichtgroen
+    color_discrete_sequence=['#FFA07A', '#90EE90'],  
     category_orders={'Survived': [0, 1]}
 )
 
@@ -65,7 +66,7 @@ fig_age_dist.update_layout(
     legend_title_text='Overleving',
     xaxis_title='Leeftijd',
     yaxis_title='Aantal Passagiers',
-    xaxis=dict(range=[0, 80])  # Stel de x-as limiet van 0 tot 80
+    xaxis=dict(range=[0, 80])  
 )
 
 # Weergave van de grafiek
