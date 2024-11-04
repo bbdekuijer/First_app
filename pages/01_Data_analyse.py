@@ -25,17 +25,30 @@ with col2:
     st.subheader("Basis Statistieken")
     st.write(data.describe())  # Basisstatistieken van de dataset
 
-# Zet de klassen in de juiste volgorde
-pclass_options = sorted(data['Pclass'].unique())
+# Sectie voor NaN-verdeling met boxplot
+st.subheader("Verdeling van Missende Waarden per Kolom")
+# Maak een dataframe dat telt hoeveel NaN's er in elke kolom zitten
+nan_data = pd.DataFrame(data.isna().sum(), columns=['NaN Count']).reset_index()
+nan_data.columns = ['Column', 'NaN Count']
+
+# Maak een boxplot voor de NaN-waarden
+fig_nan_box = px.box(nan_data, y='NaN Count', points="all", title="Verdeling van Missende Waarden per Kolom")
+fig_nan_box.update_layout(
+    xaxis_title="Kolommen",
+    yaxis_title="Aantal Missende Waarden",
+    showlegend=False
+)
+st.plotly_chart(fig_nan_box)
 
 # Titel voor leeftijdsdistributie en passagiersklasse-selectiebox
 st.subheader("Leeftijdsdistributie per Passagiersklasse")
+pclass_options = sorted(data['Pclass'].unique())
 pclass = st.selectbox("Selecteer een passagiersklasse:", pclass_options)
 
 # Filter de data op basis van de geselecteerde klasse en verwijder NaN-waarden in de Age kolom
 filtered_data = data[(data['Pclass'] == pclass) & (data['Age'].notna())]
 
-# Maak de histogram met aangepaste kleuren en vaste x-as limieten
+# Maak de histogram met de oorspronkelijke kleuren en vaste x-as limieten
 fig_age_dist = px.histogram(
     filtered_data,
     x='Age',
@@ -43,7 +56,7 @@ fig_age_dist = px.histogram(
     title=f"Leeftijdsdistributie voor Passagiers in Klasse {pclass}",
     labels={'Age': 'Leeftijd'},
     color='Survived',
-    color_discrete_map={0: 'lightblue', 1: 'lightgreen'},
+    color_discrete_sequence=['#FFA07A', '#90EE90'],  # Kleuren: zacht oranje en lichtgroen
     category_orders={'Survived': [0, 1]}
 )
 
