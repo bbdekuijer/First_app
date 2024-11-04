@@ -5,42 +5,28 @@ import pandas as pd
 data_path = "Data/Raw/train.csv"
 data = pd.read_csv(data_path)
 
-# Hoofdtitel
-st.title("Titanic Data Analyse App")
+# Hoofdtitel met emoji
+st.title("🛳️ Titanic Data Analyse App")
 
-# Introductie
-st.write("Welkom bij de Titanic Data Analyse App. Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren met behulp van machine learning.")
+# Introductie met emoji
+st.write("Welkom bij de Titanic Data Analyse App! 📊 Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren.")
 
-# CSS voor styling
-st.markdown(
-    """
-    <style>
-    .image-container {
-        position: fixed; 
-        bottom: 10px; 
-        left: 10px;
-        z-index: 1;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# Informatie over de dataset
+st.header("📁 Dataset Informatie")
+st.write("Hieronder vind je een samenvatting van de Titanic dataset:")
 
-# Afbeelding links onderin toevoegen
-st.markdown(
-    """
-    <div class="image-container">
-        <img src="Afbeeldingen/Titanic.jpg" alt="Titanic" style="width: 100px; height: auto;">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Toon de eerste paar rijen van de dataset
+st.subheader("👀 Eerste Kijk naar de Gegevens")
+st.dataframe(data.head())  # Laat de eerste 5 rijen van de dataset zien
 
-# Sectie voor data-analyse
-st.header("Data-analyse")
-st.subheader("Bekijk de gegevens")
-st.dataframe(data.head())
+# Statistieken van de dataset
+st.subheader("📊 Basis Statistieken")
+st.write(data.describe())  # Basisstatistieken van de dataset
 
-# Statistieken
-st.subheader("Basisstatistieken")
-st.write(data.describe())
+# Sectie over de kolommen in de dataset
+st.subheader("🗂️ Kolomnamen")
+st.write("De Titanic dataset bevat de volgende kolommen:")
+st.write(data.columns.tolist())  # Toon een lijst van kolomnamen
+
+# Extra informatie
+st.write("Gebruik de navigatie aan de zijkant om verder te gaan met data-analyse, visualisaties, of machine learning!")
