@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 # Laad de dataset
 data_path = "Data/Raw/train.csv"
@@ -24,7 +25,29 @@ with col2:
     st.subheader("Basis Statistieken")
     st.write(data.describe())  # Basisstatistieken van de dataset
 
-# Kolomnamen
-st.subheader("Kolomnamen")
-st.write(data.columns.tolist())  # Toon de kolomnamen
+# Selectiebox voor passagiersklasse
+pclass = st.selectbox("Selecteer een passagiersklasse:", data['Pclass'].unique())
 
+# Bereken de gemiddelde leeftijd per passagiersklasse
+avg_age = data[data['Pclass'] == pclass]['Age'].mean()
+
+# Toon gemiddelde leeftijd
+st.write(f"De gemiddelde leeftijd voor passagiers in klasse {pclass} is {avg_age:.2f} jaar.")
+
+# Creëer een DataFrame voor de visualisatie van gemiddelde leeftijden
+age_data = data.groupby('Pclass')['Age'].mean().reset_index()
+
+# Interactieve grafiek van de gemiddelde leeftijd per passagiersklasse
+fig_age = px.bar(age_data, x='Pclass', y='Age', 
+                  title="Gemiddelde Leeftijd per Passagiersklasse",
+                  labels={'Pclass': 'Passagiersklasse', 'Age': 'Gemiddelde Leeftijd'},
+                  color='Age', color_continuous_scale=px.colors.sequential.Plasma)
+
+# Voeg een lijn toe voor de gemiddelde leeftijd van de geselecteerde klasse
+fig_age.add_scatter(x=[pclass], y=[avg_age], mode='markers+text', 
+                    marker=dict(color='red', size=10),
+                    text=["Gemiddelde Leeftijd geselecteerde klasse"],
+                    textposition="top center")
+
+# Weergave van de grafiek
+st.plotly_chart(fig_age)
