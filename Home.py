@@ -12,7 +12,7 @@ st.title("Titanic Data Analyse App")
 st.write("Welkom bij de Titanic Data Analyse App. Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren met behulp van machine learning.")
 
 # Afbeelding onderaan de pagina
-st.image("Afbeeldingen/Titanic.jpg", caption="Titanic Eindpresentatie VA", width = 20)
+st.image("Afbeeldingen/Titanic.jpg", caption="Titanic Eindpresentatie VA", width = 100)
 
 # Afbeelding links onderin toevoegen met CSS
 st.markdown(
