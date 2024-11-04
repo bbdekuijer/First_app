@@ -28,26 +28,22 @@ with col2:
 # Selectiebox voor passagiersklasse
 pclass = st.selectbox("Selecteer een passagiersklasse:", data['Pclass'].unique())
 
-# Bereken de gemiddelde leeftijd per passagiersklasse
-avg_age = data[data['Pclass'] == pclass]['Age'].mean()
+# Interactieve histogram van de leeftijdsdistributie per passagiersklasse
+st.subheader(f"Leeftijdsdistributie voor klasse {pclass}")
 
-# Toon gemiddelde leeftijd
-st.write(f"De gemiddelde leeftijd voor passagiers in klasse {pclass} is {avg_age:.2f} jaar.")
+# Filter de data op basis van de geselecteerde klasse
+filtered_data = data[data['Pclass'] == pclass]
 
-# Creëer een DataFrame voor de visualisatie van gemiddelde leeftijden
-age_data = data.groupby('Pclass')['Age'].mean().reset_index()
+# Maak de histogram
+fig_age_dist = px.histogram(filtered_data, x='Age', nbins=30, 
+                             title=f"Leeftijdsdistributie voor Passagiers in Klasse {pclass}",
+                             labels={'Age': 'Leeftijd'},
+                             color='Survived',  # Kleur op basis van overleving
+                             color_continuous_scale=px.colors.sequential.Plasma,
+                             category_orders={'Survived': [0, 1]})
 
-# Interactieve grafiek van de gemiddelde leeftijd per passagiersklasse
-fig_age = px.bar(age_data, x='Pclass', y='Age', 
-                  title="Gemiddelde Leeftijd per Passagiersklasse",
-                  labels={'Pclass': 'Passagiersklasse', 'Age': 'Gemiddelde Leeftijd'},
-                  color='Age', color_continuous_scale=px.colors.sequential.Plasma)
-
-# Voeg een lijn toe voor de gemiddelde leeftijd van de geselecteerde klasse
-fig_age.add_scatter(x=[pclass], y=[avg_age], mode='markers+text', 
-                    marker=dict(color='red', size=10),
-                    text=["Gemiddelde Leeftijd geselecteerde klasse"],
-                    textposition="top center")
+# Voeg een legenda toe
+fig_age_dist.update_layout(legend_title_text='Overleving', xaxis_title='Leeftijd', yaxis_title='Aantal Passagiers')
 
 # Weergave van de grafiek
-st.plotly_chart(fig_age)
+st.plotly_chart(fig_age_dist)
