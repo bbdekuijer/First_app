@@ -25,20 +25,20 @@ with col2:
     st.subheader("Basis Statistieken")
     st.write(data.describe())  # Basisstatistieken van de dataset
 
-# Sectie voor NaN-verdeling met boxplot
+# Sectie voor NaN-verdeling met staafdiagram
 st.subheader("Verdeling van Missende Waarden per Kolom")
 # Maak een dataframe dat telt hoeveel NaN's er in elke kolom zitten
 nan_data = pd.DataFrame(data.isna().sum(), columns=['NaN Count']).reset_index()
 nan_data.columns = ['Column', 'NaN Count']
 
-# Maak een boxplot voor de NaN-waarden
-fig_nan_box = px.box(nan_data, y='NaN Count', points="all", title="Verdeling van Missende Waarden per Kolom")
-fig_nan_box.update_layout(
+# Maak een staafdiagram voor de NaN-waarden
+fig_nan_bar = px.bar(nan_data, x='Column', y='NaN Count', title="Aantal Missende Waarden per Kolom")
+fig_nan_bar.update_layout(
     xaxis_title="Kolommen",
     yaxis_title="Aantal Missende Waarden",
     showlegend=False
 )
-st.plotly_chart(fig_nan_box)
+st.plotly_chart(fig_nan_bar)
 
 # Titel voor leeftijdsdistributie en passagiersklasse-selectiebox
 st.subheader("Leeftijdsdistributie per Passagiersklasse")
