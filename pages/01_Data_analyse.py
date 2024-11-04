@@ -1,36 +1,30 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-
-# Titel van de Streamlit-app
-st.title("Titanic Missing Values Visualizer")
-
-# Specificeer het pad naar de train.csv dataset
-data_path = "Data/Raw/train.csv"
 
 # Laad de dataset
+data_path = "Data/Raw/train.csv"
 data = pd.read_csv(data_path)
 
-# Bereken het aantal ontbrekende waarden per kolom
-missing_values = data.isnull().sum()
-missing_df = pd.DataFrame({
-    "Column": missing_values.index,
-    "Missing Values": missing_values.values
-})
+# Hoofdtitel
+st.title("Data Analyse")
 
-# Plotly interactieve bar plot voor ontbrekende waarden
-fig = px.bar(
-    missing_df, 
-    x="Column", 
-    y="Missing Values",
-    title="Number of Missing Values per Column",
-    labels={"Column": "Column Name", "Missing Values": "Count of Missing Values"},
-    template="plotly_white"
-)
+# Introductie
+st.write("In deze sectie kun je de dataset verkennen en basisstatistieken bekijken.")
 
-# Toon de plot in Streamlit
-st.plotly_chart(fig)
+# Maak twee kolommen voor de data en de statistieken
+col1, col2 = st.columns(2)
 
-# Toon optioneel de eerste paar rijen van de dataset
-st.write("Sample Data:")
-st.dataframe(data.head())
+# Eerste kolom voor de eerste paar rijen van de dataset
+with col1:
+    st.subheader("Gegevens")
+    st.dataframe(data.head(8))  # Laat de eerste 8 rijen van de dataset zien
+
+# Tweede kolom voor de basisstatistieken
+with col2:
+    st.subheader("Basis Statistieken")
+    st.write(data.describe())  # Basisstatistieken van de dataset
+
+# Kolomnamen
+st.subheader("Kolomnamen")
+st.write(data.columns.tolist())  # Toon de kolomnamen
+
