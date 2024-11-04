@@ -9,30 +9,33 @@ data = pd.read_csv(data_path)
 # Titel van de visualisatie sectie
 st.title("Interactieve Visualisatie van Overlevingsstatistieken")
 
-# Histogram van overleving op basis van geslacht
-st.subheader("Overleving op basis van Geslacht")
-fig_gender = px.histogram(data, x='Sex', color='Survived', 
-                           title="Overleving op basis van Geslacht", 
-                           labels={'Sex': 'Geslacht', 'Survived': 'Overleefd'},
-                           color_discrete_map={0: 'red', 1: 'green'},
-                           barmode='group')
-st.plotly_chart(fig_gender)
+# Selectiebox voor grafiektype
+chart_type = st.selectbox("Selecteer de grafiek die je wilt zien:", 
+                           ["Overleving op basis van Geslacht", 
+                            "Overleving op basis van Passagiersklasse", 
+                            "Leeftijdsverdeling van Overlevenden en Niet-Overlevenden"])
 
-# Histogram van overleving op basis van Passagiersklasse
-st.subheader("Overleving op basis van Passagiersklasse")
-fig_class = px.histogram(data, x='Pclass', color='Survived', 
-                          title="Overleving op basis van Passagiersklasse",
-                          labels={'Pclass': 'Klasse', 'Survived': 'Overleefd'},
-                          color_discrete_map={0: 'red', 1: 'green'},
-                          barmode='group')
-st.plotly_chart(fig_class)
+# Grafiek weergeven op basis van de selectie
+if chart_type == "Overleving op basis van Geslacht":
+    fig_gender = px.histogram(data, x='Sex', color='Survived', 
+                               title="Overleving op basis van Geslacht", 
+                               labels={'Sex': 'Geslacht', 'Survived': 'Overleefd'},
+                               color_discrete_map={0: 'orange', 1: 'blue'},  # Aangepaste kleuren
+                               barmode='group')
+    st.plotly_chart(fig_gender)
 
-# Histogram van overleving op basis van Leeftijd
-st.subheader("Leeftijdsverdeling van Overlevenden en Niet-Overlevenden")
-fig_age = px.histogram(data, x='Age', color='Survived', 
-                        title="Leeftijdsverdeling van Overlevenden",
-                        labels={'Age': 'Leeftijd', 'Survived': 'Overleefd'},
-                        color_discrete_map={0: 'red', 1: 'green'},
-                        marginal='box')  # Voeg boxplot toe voor extra inzicht
-st.plotly_chart(fig_age)
+elif chart_type == "Overleving op basis van Passagiersklasse":
+    fig_class = px.histogram(data, x='Pclass', color='Survived', 
+                              title="Overleving op basis van Passagiersklasse",
+                              labels={'Pclass': 'Klasse', 'Survived': 'Overleefd'},
+                              color_discrete_map={0: 'orange', 1: 'blue'},  # Aangepaste kleuren
+                              barmode='group')
+    st.plotly_chart(fig_class)
 
+elif chart_type == "Leeftijdsverdeling van Overlevenden en Niet-Overlevenden":
+    fig_age = px.histogram(data, x='Age', color='Survived', 
+                            title="Leeftijdsverdeling van Overlevenden",
+                            labels={'Age': 'Leeftijd', 'Survived': 'Overleefd'},
+                            color_discrete_map={0: 'orange', 1: 'blue'},  # Aangepaste kleuren
+                            marginal='box')  # Voeg boxplot toe voor extra inzicht
+    st.plotly_chart(fig_age)
