@@ -8,24 +8,15 @@ data = pd.read_csv(data_path)
 # Hoofdtitel
 st.title("Titanic Data Analyse App")
 
-# Achtergrondafbeelding instellen
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("./Afbeeldingen/Titanic.jpg");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Introductie
 st.write("Welkom bij de Titanic Data Analyse App. Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren met behulp van machine learning.")
 
-# Test of de afbeelding kan worden geladen
-st.image("Afbeeldingen/Titanic.jpg", caption="Titanic", use_column_width=True)
+# Afbeelding links onderin toevoegen
+st.markdown(
+    """
+    <div style="position: fixed; bottom: 0; left: 0; padding: 10px;">
+        <img src="Afbeeldingen/Titanic.jpg" alt="Titanic" style="width: 100px; height: auto;">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
