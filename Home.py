@@ -26,3 +26,6 @@ st.markdown(
 
 # Introductie
 st.write("Welkom bij de Titanic Data Analyse App. Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren met behulp van machine learning.")
+
+# Test of de afbeelding kan worden geladen
+st.image("Afbeeldingen/Titanic.jpg", caption="Titanic", use_column_width=True)
