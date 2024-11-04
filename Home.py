@@ -13,7 +13,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("Afbeeldingen/Titanic.jpg");
+        background-image: url("./Afbeeldingen/Titanic.jpg");
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
