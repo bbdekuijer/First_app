@@ -25,34 +25,34 @@ with col2:
     st.subheader("Basis Statistieken")
     st.write(data.describe())  # Basisstatistieken van de dataset
 
-# Selectiebox voor passagiersklasse
-pclass = st.selectbox("Selecteer een passagiersklasse:", data['Pclass'].unique())
+# Zet de klassen in de juiste volgorde
+pclass_options = sorted(data['Pclass'].unique())
+
+# Titel voor leeftijdsdistributie en passagiersklasse-selectiebox
+st.subheader("Leeftijdsdistributie per Passagiersklasse")
+pclass = st.selectbox("Selecteer een passagiersklasse:", pclass_options)
 
 # Filter de data op basis van de geselecteerde klasse en verwijder NaN-waarden in de Age kolom
 filtered_data = data[(data['Pclass'] == pclass) & (data['Age'].notna())]
 
-# Interactieve histogram van de leeftijdsdistributie per passagiersklasse
-st.subheader(f"Leeftijdsdistributie voor klasse {pclass}")
-
-# Maak de histogram
+# Maak de histogram met oranje en groen kleuren voor Survived 0 en 1
 fig_age_dist = px.histogram(
-    filtered_data, 
-    x='Age', 
+    filtered_data,
+    x='Age',
     nbins=30,
     title=f"Leeftijdsdistributie voor Passagiers in Klasse {pclass}",
     labels={'Age': 'Leeftijd'},
-    color='Survived',  # Kleur op basis van overleving
-    color_discrete_sequence=px.colors.sequential.Plasma,
+    color='Survived',
+    color_discrete_map={0: 'orange', 1: 'green'},
     category_orders={'Survived': [0, 1]}
 )
 
 # Voeg een legenda toe
 fig_age_dist.update_layout(
-    legend_title_text='Overleving', 
-    xaxis_title='Leeftijd', 
+    legend_title_text='Overleving',
+    xaxis_title='Leeftijd',
     yaxis_title='Aantal Passagiers'
 )
 
 # Weergave van de grafiek
 st.plotly_chart(fig_age_dist)
-
