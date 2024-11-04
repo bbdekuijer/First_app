@@ -21,17 +21,10 @@ col1, col2 = st.columns(2)
 # Eerste kolom voor de eerste paar rijen van de dataset
 with col1:
     st.subheader("👀 Eerste Kijk naar de Gegevens")
-    st.dataframe(data.head())  # Laat de eerste 5 rijen van de dataset zien
+    st.dataframe(data.head(8))  # Laat de eerste 8 rijen van de dataset zien
 
 # Tweede kolom voor de basisstatistieken
 with col2:
     st.subheader("📊 Basis Statistieken")
     st.write(data.describe())  # Basisstatistieken van de dataset
 
-# Sectie over de kolommen in de dataset
-st.subheader("🗂️ Kolomnamen")
-st.write("De Titanic dataset bevat de volgende kolommen:")
-st.write(data.columns.tolist())  # Toon een lijst van kolomnamen
-
-# Extra informatie
-st.write("Gebruik de navigatie aan de zijkant om verder te gaan met data-analyse, visualisaties, of machine learning!")
