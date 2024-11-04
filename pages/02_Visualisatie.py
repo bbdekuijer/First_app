@@ -1,29 +1,38 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Laad de dataset
 data_path = "Data/Raw/train.csv"
 data = pd.read_csv(data_path)
 
-# Hoofdtitel
-st.title("Visualisatie")
+# Titel van de visualisatie sectie
+st.title("Interactieve Visualisatie van Overlevingsstatistieken")
 
-# Introductie
-st.write("In deze sectie kun je grafieken en visualisaties bekijken.")
+# Histogram van overleving op basis van geslacht
+st.subheader("Overleving op basis van Geslacht")
+fig_gender = px.histogram(data, x='Sex', color='Survived', 
+                           title="Overleving op basis van Geslacht", 
+                           labels={'Sex': 'Geslacht', 'Survived': 'Overleefd'},
+                           color_discrete_map={0: 'red', 1: 'green'},
+                           barmode='group')
+st.plotly_chart(fig_gender)
 
-# Eenvoudig staafdiagram voor overleving
-st.subheader("Aantal Overlevenden")
-survived_counts = data['Survived'].value_counts()
-fig, ax = plt.subplots()
-ax.bar(['Niet Overleefd', 'Overleefd'], survived_counts, color=['red', 'green'])
-ax.set_ylabel('Aantal Passagiers')
-st.pyplot(fig)  # Toon de grafiek in de app
+# Histogram van overleving op basis van Passagiersklasse
+st.subheader("Overleving op basis van Passagiersklasse")
+fig_class = px.histogram(data, x='Pclass', color='Survived', 
+                          title="Overleving op basis van Passagiersklasse",
+                          labels={'Pclass': 'Klasse', 'Survived': 'Overleefd'},
+                          color_discrete_map={0: 'red', 1: 'green'},
+                          barmode='group')
+st.plotly_chart(fig_class)
 
-# Histogram van leeftijden
-st.subheader("Leeftijdshistogram")
-fig2, ax2 = plt.subplots()
-ax2.hist(data['Age'].dropna(), bins=30, color='blue', alpha=0.7)
-ax2.set_xlabel('Leeftijd')
-ax2.set_ylabel('Aantal Passagiers')
-st.pyplot(fig2)  # Toon de histogram in de app
+# Histogram van overleving op basis van Leeftijd
+st.subheader("Leeftijdsverdeling van Overlevenden en Niet-Overlevenden")
+fig_age = px.histogram(data, x='Age', color='Survived', 
+                        title="Leeftijdsverdeling van Overlevenden",
+                        labels={'Age': 'Leeftijd', 'Survived': 'Overleefd'},
+                        color_discrete_map={0: 'red', 1: 'green'},
+                        marginal='box')  # Voeg boxplot toe voor extra inzicht
+st.plotly_chart(fig_age)
+
