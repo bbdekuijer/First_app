@@ -11,15 +11,36 @@ st.title("Titanic Data Analyse App")
 # Introductie
 st.write("Welkom bij de Titanic Data Analyse App. Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren met behulp van machine learning.")
 
-# Afbeelding onderaan de pagina
-st.image("Afbeeldingen/Titanic.jpg", caption="Titanic Eindpresentatie VA", width = 100)
-
-# Afbeelding links onderin toevoegen met CSS
+# CSS voor styling
 st.markdown(
     """
-    <div style="position: fixed; bottom: 10px; left: 10px; padding: 10px;">
-        <img src="Afbeeldingen/Titanic.jpg" alt="Titanic" style="width: 150px; height: auto;">
+    <style>
+    .image-container {
+        position: fixed; 
+        bottom: 10px; 
+        left: 10px;
+        z-index: 1;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Afbeelding links onderin toevoegen
+st.markdown(
+    """
+    <div class="image-container">
+        <img src="Afbeeldingen/Titanic.jpg" alt="Titanic" style="width: 100px; height: auto;">
     </div>
     """,
     unsafe_allow_html=True
 )
+
+# Sectie voor data-analyse
+st.header("Data-analyse")
+st.subheader("Bekijk de gegevens")
+st.dataframe(data.head())
+
+# Statistieken
+st.subheader("Basisstatistieken")
+st.write(data.describe())
