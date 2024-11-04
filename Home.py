@@ -15,13 +15,18 @@ st.write("Welkom bij de Titanic Data Analyse App! 📊 Deze app biedt een intera
 st.header("📁 Dataset Informatie")
 st.write("Hieronder vind je een samenvatting van de Titanic dataset:")
 
-# Toon de eerste paar rijen van de dataset
-st.subheader("👀 Eerste Kijk naar de Gegevens")
-st.dataframe(data.head())  # Laat de eerste 5 rijen van de dataset zien
+# Maak twee kolommen voor de data en de statistieken
+col1, col2 = st.columns(2)
 
-# Statistieken van de dataset
-st.subheader("📊 Basis Statistieken")
-st.write(data.describe())  # Basisstatistieken van de dataset
+# Eerste kolom voor de eerste paar rijen van de dataset
+with col1:
+    st.subheader("👀 Eerste Kijk naar de Gegevens")
+    st.dataframe(data.head())  # Laat de eerste 5 rijen van de dataset zien
+
+# Tweede kolom voor de basisstatistieken
+with col2:
+    st.subheader("📊 Basis Statistieken")
+    st.write(data.describe())  # Basisstatistieken van de dataset
 
 # Sectie over de kolommen in de dataset
 st.subheader("🗂️ Kolomnamen")
