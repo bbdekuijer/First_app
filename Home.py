@@ -6,9 +6,6 @@ st.title("Titanic Data Analyse App")
 # Introductie
 st.write("Welkom bij de Titanic Data Analyse App! Deze app biedt een interactieve manier om de Titanic-dataset te verkennen, visualiseren en te analyseren.")
 
-# Afbeelding van de Titanic
-st.image("Afbeeldingen/Titanic.jpg", use_column_width=True)  # Zorg ervoor dat het pad naar je afbeelding correct is
-
 # Secties zonder navigatie
 st.header("Secties:")
 st.write("[Data Analyse](pages/01_Data_analyse.py)")
