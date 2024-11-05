@@ -49,28 +49,44 @@ pclass = st.selectbox("Selecteer een passagiersklasse:", pclass_options)
 # Filter de data op basis van de geselecteerde klasse en verwijder NaN-waarden in de Age kolom
 filtered_data = data[(data['Pclass'] == pclass) & (data['Age'].notna())]
 
-# Maak de histogram met vaste x-as limieten, bin-grootte en kleuren
-fig_age_dist = px.histogram(
-    filtered_data,
-    x='Age',
-    title=f"Leeftijdsdistributie voor Passagiers in Klasse {pclass}",
-    labels={'Age': 'Leeftijd'},
-    color='Survived',
-    color_discrete_sequence=['#FFA07A', '#90EE90'],  # Kleuren: zacht oranje en lichtgroen
-    category_orders={'Survived': [0, 1]}
-)
+# Checkboxen voor het weergeven van de histogram en boxplot
+show_histogram = st.checkbox("Toon Histogram")
+show_boxplot = st.checkbox("Toon Boxplot")
 
-# Forceer de bin-grootte op 5 (zodat 80/5 = 16 bins) en stel de x-as vast van 0 tot 80
-fig_age_dist.update_traces(xbins=dict(start=0, end=80, size=5))
-fig_age_dist.update_layout(
-    legend_title_text='Overleving',
-    xaxis_title='Leeftijd',
-    yaxis_title='Aantal Passagiers',
-    xaxis=dict(range=[0, 80])  # Stel de x-as limiet vast van 0 tot 80
-)
+# Als histogram geselecteerd is, maak en toon de histogram
+if show_histogram:
+    fig_age_hist = px.histogram(
+        filtered_data,
+        x='Age',
+        title=f"Leeftijdsdistributie voor Passagiers in Klasse {pclass}",
+        labels={'Age': 'Leeftijd'},
+        color='Survived',
+        color_discrete_sequence=['#FFA07A', '#90EE90'],  # Kleuren: zacht oranje en lichtgroen
+        category_orders={'Survived': [0, 1]}
+    )
+    # Forceer de bin-grootte op 5 (zodat 80/5 = 16 bins) en stel de x-as vast van 0 tot 80
+    fig_age_hist.update_traces(xbins=dict(start=0, end=80, size=5))
+    fig_age_hist.update_layout(
+        legend_title_text='Overleving',
+        xaxis_title='Leeftijd',
+        yaxis_title='Aantal Passagiers',
+        xaxis=dict(range=[0, 80])  # Stel de x-as limiet vast van 0 tot 80
+    )
+    st.plotly_chart(fig_age_hist)
 
-# Weergave van de grafiek
-st.plotly_chart(fig_age_dist)
+# Als boxplot geselecteerd is, maak en toon de boxplot
+if show_boxplot:
+    fig_age_box = px.box(
+        filtered_data,
+        y='Age',
+        title=f"Leeftijdsverdeling voor Passagiers in Klasse {pclass}",
+        color_discrete_sequence=['#4682B4']  # Zachte blauwe kleur voor de boxplot
+    )
+    fig_age_box.update_layout(
+        xaxis_title="",
+        yaxis_title="Leeftijd"
+    )
+    st.plotly_chart(fig_age_box)
 
 # Vervang de afkortingen in de 'Embarked' kolom met de volledige haven namen
 data['Embarked_Full'] = data['Embarked'].map({'S': 'Southampton', 'C': 'Cherbourg', 'Q': 'Queenstown'})
