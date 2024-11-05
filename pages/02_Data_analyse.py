@@ -69,13 +69,18 @@ combined.loc[idx, 'Cabin'] = 'M'
 nan_counts_after = combined.isnull().sum()
 nan_data_after = pd.DataFrame({'Kolom': nan_counts_after.index, 'Aantal Missende Waarden': nan_counts_after.values})
 
-# Toon NaN count voor bewerkingen
-st.subheader("Missende Waarden vóór de bewerkingen")
-st.write(nan_data_before)
+# Maak twee kolommen om de NaN-telling weer te geven
+col_nan_before, col_nan_after = st.columns(2)
 
-# Toon NaN count na bewerkingen
-st.subheader("Missende Waarden na de bewerkingen")
-st.write(nan_data_after)
+# Toon NaN count voor bewerkingen in de eerste kolom
+with col_nan_before:
+    st.subheader("NaN's vóór de bewerkingen")
+    st.write(nan_data_before)
+
+# Toon NaN count na bewerkingen in de tweede kolom
+with col_nan_after:
+    st.subheader("NaN's na de bewerkingen")
+    st.write(nan_data_after)
 
 # Extra uitleg
 st.write("""
