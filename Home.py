@@ -7,13 +7,16 @@ st.title("Titanic Data Analyse App")
 st.markdown(
     """
     <style>
-    .stApp {
-        background-image: url('Afbeeldingen/HVA.png');
-        background-position: left bottom;
-        background-repeat: no-repeat;
-        background-size: 200px;  /* Pas de grootte van de afbeelding aan zoals gewenst */
+    .background-image {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        width: 200px;
+        opacity: 0.8;
+        z-index: -1;
     }
     </style>
+    <img src='Afbeeldingen/HVA.png' class='background-image'>
     """,
     unsafe_allow_html=True
 )
@@ -28,3 +31,4 @@ Met behulp van deze app kun je:
 
 Duik erin en ontdek zelf de patronen en inzichten die de Titanic-data te bieden heeft!
 """)
+
