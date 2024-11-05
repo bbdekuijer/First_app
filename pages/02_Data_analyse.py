@@ -32,7 +32,7 @@ col1, col2 = st.columns(2)
 
 # Eerste kolom voor de eerste paar rijen van de dataset (voorafgaand aan bewerkingen)
 with col1:
-    st.subheader("Eerste 8 rijen van de gecombineerde dataset")
+    st.subheader("Eerste 8 rijen van de dataset")
     st.dataframe(combined.head(8))
 
 # Tweede kolom voor de basisstatistieken
@@ -43,10 +43,6 @@ with col2:
 # Aantal NaN-waarden in de dataset vóór de bewerkingen
 nan_counts_before = combined.isnull().sum()
 nan_data_before = pd.DataFrame({'Kolom': nan_counts_before.index, 'Aantal Missende Waarden': nan_counts_before.values})
-
-# Toon NaN count voor bewerkingen
-st.subheader("Aantal Missende Waarden vóór de bewerkingen")
-st.write(nan_data_before)
 
 # Vul de 'Age' kolom op met de mediaan per klasse
 median_age_per_class = combined.groupby('Pclass')['Age'].median()
@@ -73,13 +69,13 @@ combined.loc[idx, 'Cabin'] = 'M'
 nan_counts_after = combined.isnull().sum()
 nan_data_after = pd.DataFrame({'Kolom': nan_counts_after.index, 'Aantal Missende Waarden': nan_counts_after.values})
 
-# Toon NaN count na bewerkingen
-st.subheader("Aantal Missende Waarden na de bewerkingen")
-st.write(nan_data_after)
+# Toon NaN count voor bewerkingen
+st.subheader("Missende Waarden vóór de bewerkingen")
+st.write(nan_data_before)
 
-# Toon de eerste 8 rijen van de dataset na de bewerkingen
-st.subheader("Eerste 8 rijen na het invullen van missende waarden")
-st.dataframe(combined.head(8))
+# Toon NaN count na bewerkingen
+st.subheader("Missende Waarden na de bewerkingen")
+st.write(nan_data_after)
 
 # Extra uitleg
 st.write("""
