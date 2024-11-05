@@ -37,3 +37,16 @@ with col1:
 with col2:
     st.subheader("Basis Statistieken")
     st.write(combined.describe())  # Basisstatistieken van de dataset
+
+# Count of NaN values in each column
+nan_counts = combined.isnull().sum()
+nan_data = pd.DataFrame({'Column': nan_counts.index, 'NaN Count': nan_counts.values})
+
+# Display NaN count as a table
+st.subheader("Aantal Missende Waarden per Kolom")
+st.write(nan_data)
+
+# Optional: Display as a bar chart for visualization
+st.subheader("Visualisatie van Missende Waarden")
+fig_nan_bar = px.bar(nan_data, x='Column', y='NaN Count', title="Aantal Missende Waarden per Kolom")
+st.plotly_chart(fig_nan_bar)
