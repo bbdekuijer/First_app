@@ -39,8 +39,8 @@ st.write("""
 In deze sectie hebben we de volgende bewerkingen uitgevoerd op de dataset:
 - **Leeftijd (Age)** is opgevuld met de mediaan per klasse.
 - **Vervoersprijs (Fare)** is opgevuld met de mediaan van mensen met dezelfde klasse en embarcatie locatie.
-- **Embark locatie (Embarked)** is opgevuld met de meest voorkomende locatie ('C') voor de juiste klasse en Fare-range.
 - **Cabin** is opgevuld met 'M' en we hebben de letter 'T' aangepast naar 'M' vanwege vermoedelijke typefouten.
+- **Embark locatie (Embarked)** is opgevuld met de meest voorkomende locatie ('C') voor de juiste klasse en Fare-range.
 """)
 
 # Vul 'Age' met mediane leeftijd per klasse
@@ -59,11 +59,6 @@ combined['Embarked'].fillna('C', inplace=True)
 combined['Cabin'].fillna('M', inplace=True)
 combined['Cabin'] = combined['Cabin'].str[0]
 combined.loc[combined['Cabin'] == 'T', 'Cabin'] = 'M'  # Aanpassen 'T' naar 'M'
-
-# Toon aantal NaN na bewerkingen
-nan_counts_after = combined.isnull().sum()
-st.write("Aantal missende waarden per kolom na de bewerkingen:")
-st.write(nan_counts_after[nan_counts_after > 0])
 
 # 2. Categoriseren van 'Title' en extractie uit 'Name'
 st.subheader("Stap 2: Extractie en Categorisatie van Titels")
