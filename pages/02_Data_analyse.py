@@ -34,9 +34,13 @@ nan_counts_before = combined.isnull().sum()
 st.write("Aantal missende waarden per kolom vóór de bewerkingen:")
 st.write(nan_counts_before[nan_counts_before > 0])
 
+# Extra uitleg
 st.write("""
-Om nauwkeurige voorspellingen te maken, moeten we ontbrekende gegevens opvullen. We vullen de leeftijd (`Age`) in met de mediaan 
-per klasse (`Pclass`) om representatieve waarden te behouden.
+In deze sectie hebben we de volgende bewerkingen uitgevoerd op de dataset:
+- **Leeftijd (Age)** is opgevuld met de mediaan per klasse.
+- **Vervoersprijs (Fare)** is opgevuld met de mediaan van mensen met dezelfde klasse en embarcatie locatie.
+- **Embark locatie (Embarked)** is opgevuld met de meest voorkomende locatie ('C') voor de juiste klasse en Fare-range.
+- **Cabin** is opgevuld met 'M' en we hebben de letter 'T' aangepast naar 'M' vanwege vermoedelijke typefouten.
 """)
 
 # Vul 'Age' met mediane leeftijd per klasse
