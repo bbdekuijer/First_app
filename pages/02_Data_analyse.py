@@ -14,7 +14,7 @@ train = train.drop(['Survived'], axis=1)
 combined = pd.concat([train, test]).reset_index(drop=True)
 
 # Hoofdtitel
-st.title("Titanic Data Voorbereiding voor Machine Learning")
+st.title("Titanic Data voor Machine Learning")
 
 # Introductie
 st.write("""
