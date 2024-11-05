@@ -77,14 +77,6 @@ nan_data_after = pd.DataFrame({'Kolom': nan_counts_after.index, 'Aantal Missende
 st.subheader("Aantal Missende Waarden na de bewerkingen")
 st.write(nan_data_after)
 
-# Maak een grafiek om de verdeling van de 'Fare' te tonen na het opvullen
-st.subheader("Verdeling van 'Fare' na het opvullen van missende waarden")
-plt.hist(sim_fares, bins=30, color='skyblue', edgecolor='black')
-plt.title('Verdeling van vergelijkbare Fare-waarden (Pclass=3, Embarked=S)')
-plt.xlabel('Fare')
-plt.ylabel('Frequentie')
-st.pyplot(plt)
-
 # Toon de eerste 8 rijen van de dataset na de bewerkingen
 st.subheader("Eerste 8 rijen na het invullen van missende waarden")
 st.dataframe(combined.head(8))
