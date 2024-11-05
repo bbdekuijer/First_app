@@ -28,10 +28,3 @@ Met behulp van deze app kun je:
 
 Duik erin en ontdek zelf de patronen en inzichten die de Titanic-data te bieden heeft!
 """)
-
-# Toevoegen van knoppen of andere elementen voor extra interactie
-if st.button("Bekijk Data Analyse"):
-    st.write("Ga naar het Data Analyse gedeelte in het menu om de dataset te verkennen.")
-
-if st.button("Bekijk Visualisaties"):
-    st.write("Ga naar het Visualisatie gedeelte om interessante grafieken te bekijken.")
