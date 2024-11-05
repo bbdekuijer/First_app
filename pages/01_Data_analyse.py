@@ -72,8 +72,11 @@ fig_age_dist.update_layout(
 # Weergave van de grafiek
 st.plotly_chart(fig_age_dist)
 
-# Havennaam toevoegen aan de dataset voor betere labels
-data['Embarked_Full'] = data['Embarked'].replace({'S': 'Southampton', 'C': 'Cherbourg', 'Q': 'Queenstown'})
+# Vervang de afkortingen in de 'Embarked' kolom met de volledige haven namen
+data['Embarked_Full'] = data['Embarked'].map({'S': 'Southampton', 'C': 'Cherbourg', 'Q': 'Queenstown'})
+
+# Verwijder eventueel missende waarden in de 'Embarked' kolom om fouten te voorkomen
+data = data.dropna(subset=['Embarked_Full'])
 
 # Hoofdtitel
 st.title("Titanic Data Analyse - Passagiers per Haven")
@@ -83,10 +86,8 @@ st.write("Deze grafiek toont hoeveel passagiers uit elke haven aan boord van de 
 
 # Barplot voor aantal passagiers per haven
 fig_embarked = px.bar(
-    data['Embarked_Full'].value_counts().reset_index(),
-    x='index',
-    y='Embarked_Full',
-    labels={'index': 'Haven', 'Embarked_Full': 'Aantal Passagiers'},
+    data['Embarked_Full'].value_counts(),
+    labels={'index': 'Haven', 'value': 'Aantal Passagiers'},
     title="Aantal Passagiers per Haven van Vertrek",
     color_discrete_sequence=['#4682B4']  # Zachte blauwe kleur
 )
