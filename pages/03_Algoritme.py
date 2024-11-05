@@ -29,4 +29,4 @@ except FileNotFoundError:
     st.error(f"Het bestand `{file_path}` kon niet worden gevonden. Zorg ervoor dat het bestand op de juiste locatie staat.")
 
 # Afbeelding onderaan de pagina
-st.image("Afbeeldingen/Uitkomst.jpg", caption="Titanic", width=200)
+st.image("Afbeeldingen/Uitkomst.jpg", caption="Titanic", use_column_width=True)
