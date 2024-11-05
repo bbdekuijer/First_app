@@ -3,8 +3,8 @@ import pandas as pd
 import plotly.express as px
 
 # Laad de dataset
-train = pd.read_csv(Data/Raw/train.csv)
-test = pd.read_csv(Data/Raw/test.csv)
+train = pd.read_csv('Data/Raw/train.csv')
+test = pd.read_csv('Data/Raw/test.csv')
 
 #training dataset has a 'survived' column. We will save this one as a variable. 
 survived = train['Survived']
