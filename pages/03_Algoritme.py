@@ -10,29 +10,29 @@ De onderstaande tabel geeft de overlevingskansen weer op basis van de kenmerken 
 
 # Laad de voorspellingen vanuit het submission-bestand
 file_path = "Data/Edit/submission_verbeterd.csv"
-try:
-    predictions_df = pd.read_csv(file_path)
+predictions_df = pd.read_csv(file_path)
 
-    # Toon de gehele dataframe
-    st.write("Hier zijn de voorspellingen van ons model:")
-    st.write(predictions_df)  # Toon het volledige dataframe
+# Toon de gehele dataframe
+st.write("Hier zijn de voorspellingen van ons model:")
+st.write(predictions_df)  # Toon het volledige dataframe
 
-    # Visualiseer de verdeling van de overlevenden
-    survived_counts = predictions_df['Survived'].value_counts().sort_index()
-    
-    # Maak een horizontale bar chart zodat de labels goed leesbaar zijn
-    st.write("Verdeling van de voorspelde overlevingskansen:")
-    st.bar_chart(survived_counts, use_container_width=True)
+# Visualiseer de verdeling van de overlevenden
+survived_counts = predictions_df['Survived'].value_counts().sort_index()
 
-    # Samenvatting
-    st.subheader("Conclusie")
-    st.write("""
-    Deze resultaten zijn gebaseerd op het model en de voorafgaande datatransformatie. 
-    De voorspellingen geven inzicht in hoe de overleving van passagiers werd beïnvloed door de kenmerken van het schip.
-    """)
+# Vervang 0 en 1 door de labels "Niet Overleefd" en "Overleefd"
+survived_labels = {0: "Niet Overleefd", 1: "Overleefd"}
+survived_counts.index = survived_counts.index.map(survived_labels)
 
-except FileNotFoundError:
-    st.error(f"Het bestand {file_path} kon niet worden gevonden. Zorg ervoor dat het bestand op de juiste locatie staat.")
+# Maak een horizontale bar chart zodat de labels goed leesbaar zijn
+st.write("Verdeling van de voorspelde overlevingskansen:")
+st.bar_chart(survived_counts, use_container_width=True)
+
+# Samenvatting
+st.subheader("Conclusie")
+st.write("""
+Deze resultaten zijn gebaseerd op het model en de voorafgaande datatransformatie. 
+De voorspellingen geven inzicht in hoe de overleving van passagiers werd beïnvloed door de kenmerken van het schip.
+""")
 
 # Afbeelding onderaan de pagina
 st.image("Afbeeldingen/Uitkomst.jpg", caption="Titanic", use_column_width=True)
