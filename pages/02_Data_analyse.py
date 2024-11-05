@@ -6,18 +6,18 @@ import plotly.express as px
 train = pd.read_csv('Data/Raw/train.csv')
 test = pd.read_csv('Data/Raw/test.csv')
 
-#training dataset has a 'survived' column. We will save this one as a variable. 
+# Training dataset heeft een 'survived' kolom. We slaan dit op als een variabele. 
 survived = train['Survived']
 
-#we drop the 'survived' column from the train dataset. 
+# We verwijderen de 'survived' kolom uit de train dataset. 
 train = train.drop(['Survived'], axis=1)
 
-# we extract the passenger IDs from both datasets. 
+# We extraheren de passagiers-ID's uit beide datasets. 
 train_ID = train['PassengerId']
 test_ID = test['PassengerId']
 
-#here we combine the IDs from the two datasets and clean up the index. 
-combined = pd.concat([train,test]).reset_index(drop=True)
+# Hier combineren we de ID's van de twee datasets en maken we de index schoon. 
+combined = pd.concat([train, test]).reset_index(drop=True)
 
 # Hoofdtitel
 st.title("Data Analyse")
@@ -38,11 +38,27 @@ with col2:
     st.subheader("Basis Statistieken")
     st.write(combined.describe())  # Basisstatistieken van de dataset
 
-# Count of NaN values in each column
+# Aantal NaN-waarden in elke kolom
 nan_counts = combined.isnull().sum()
 nan_data = pd.DataFrame({'Column': nan_counts.index, 'NaN Count': nan_counts.values})
 
-# Display NaN count as a table
+# Display NaN count als een tabel
 st.subheader("Aantal Missende Waarden per Kolom")
 st.write(nan_data)
 
+# Vul de 'Age' kolom op met de mediaan per klasse
+median_age_per_class = combined.groupby('Pclass')['Age'].median()
+for pclass in median_age_per_class.index:
+    combined.loc[(combined['Pclass'] == pclass) & (combined['Age'].isnull()), 'Age'] = median_age_per_class[pclass]
+
+# Controleer op missende waarden na het invullen
+nan_counts_after = combined.isnull().sum()
+nan_data_after = pd.DataFrame({'Column': nan_counts_after.index, 'NaN Count': nan_counts_after.values})
+
+# Toon de bijgewerkte NaN-telling
+st.subheader("Aantal Missende Waarden na Het Opvullen van de Leeftijd")
+st.write(nan_data_after)
+
+# Weergave van de eerste paar rijen na het invullen
+st.subheader("Gegevens na het Opvullen van de Leeftijd")
+st.dataframe(combined.head(8))
