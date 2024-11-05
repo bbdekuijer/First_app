@@ -100,6 +100,10 @@ combined['Fare_Bin'] = pd.cut(combined['Fare_per_Ticket'], [0, 20, 40, 60, 80, 1
 
 st.write("Na de berekening hebben we de vervoersprijzen in categorieën gegroepeerd om de impact van prijsverschillen beter te kunnen analyseren.")
 
+# Toon voorbeeld van de gewijzigde kolommen
+st.write("Voorbeeld van de gewijzigde dataset:")
+st.write(combined[['Fare', 'Ticket', 'Ticket_Count', 'Fare_per_Ticket', 'Fare_Bin']].head(10))
+
 # 5. Berekening familiegrootte
 st.subheader("Stap 5: Berekenen van Familie Grootte")
 
