@@ -123,7 +123,7 @@ data['Embarked_Full'] = data['Embarked'].map({'S': 'Southampton', 'C': 'Cherbour
 data = data.dropna(subset=['Embarked_Full'])
 
 # Hoofdtitel
-st.title("Titanic Data Analyse - Passagiers per Haven")
+st.subheader("Titanic Data Analyse - Passagiers per Haven")
 
 # Informatie sectie over de grafiek
 st.write("Deze grafiek toont hoeveel passagiers uit elke haven aan boord van de Titanic gingen.")
