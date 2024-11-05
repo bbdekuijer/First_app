@@ -15,5 +15,5 @@ Duik erin en ontdek zelf de patronen en inzichten die de Titanic-data te bieden 
 """)
 
 # Afbeelding onderaan de pagina
-st.image("Afbeeldingen/Titanic.jpg", caption="Titanic", use_column_width=True)
+st.image("Afbeeldingen/Titanic.jpg", caption="Titanic", width=200)
 
