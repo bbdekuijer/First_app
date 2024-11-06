@@ -10,7 +10,7 @@ locations = {
 }
 
 # Start Streamlit-app
-st.title("Kaart met locaties van C, Q en S")
+st.title("Embarked: Locations")
 
 # Maak een kaart op een gemiddelde locatie tussen de drie punten
 map_center = [51, -5]  # Gemiddeld punt tussen de locaties
